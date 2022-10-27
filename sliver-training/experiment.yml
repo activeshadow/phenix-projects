@@ -1,0 +1,92 @@
+apiVersion: phenix.sandia.gov/v1
+kind: Experiment
+metadata:
+  name: sliver-training
+spec:
+  scenario:
+    apps:
+    - name: tap
+      metadata:
+        taps:
+        - bridge: phenix
+          vlan: hack
+          ip: 10.0.40.254/24
+          externalAccess:
+            enabled: true
+    - name: startup
+      hosts:
+      - hostname: pwn-win
+        metadata:
+          domain_controller:
+            ip: 10.0.40.251
+            domain: MAD.local
+            username: MAD\madAdmin
+            password: "ATT&CK"
+          auto_logon:
+            username: MAD\egismond
+            password: egPassw0rd!
+  topology:
+    nodes:
+    - general:
+        hostname: sliver
+      hardware:
+        drives:
+        - image: sliver.qc2
+        os_type: linux
+        memory: 4096
+        vcpus: 2
+      injections:
+      - src: /phenix/projects/sliver-training/injects/sliver/resolv.conf
+        dst: /etc/resolv.conf
+      network:
+        interfaces:
+        - address: 10.0.40.10
+          mask: 24
+          gateway: 10.0.40.254
+          name: IF0
+          proto: static
+          type: ethernet
+          vlan: hack
+      type: VirtualMachine
+    - general:
+        hostname: targetDC
+      annotations:
+        includes-phenix-startup: true
+        phenix/windows-rearm: true
+      hardware:
+        drives:
+        - image: mad-emu-dc.qc2
+        os_type: windows
+        memory: 4096
+        vcpus: 2
+      network:
+        interfaces:
+        - address: 10.0.40.251
+          mask: 24
+          gateway: 10.0.40.254
+          name: IF0
+          proto: static
+          type: ethernet
+          vlan: hack
+      type: VirtualMachine
+    - general:
+        hostname: pwn-win
+      annotations:
+        includes-phenix-startup: true
+        phenix/windows-rearm: true
+      hardware:
+        drives:
+        - image: win-10.qc2
+        os_type: windows
+        memory: 4096
+        vcpus: 2
+      network:
+        interfaces:
+        - address: 10.0.40.200
+          mask: 24
+          gateway: 10.0.40.254
+          name: IF0
+          proto: static
+          type: ethernet
+          vlan: hack
+      type: VirtualMachine

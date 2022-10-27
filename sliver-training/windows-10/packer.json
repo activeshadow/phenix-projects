@@ -1,0 +1,103 @@
+{
+  "_comment": "Build with `packer build packer.json`",
+  "builders": [
+    {
+      "boot_wait": "2s",
+      "communicator": "winrm",
+      "disk_size": "{{ user `disk_size` }}",
+      "floppy_files": [
+        "answers/Autounattend.xml",
+        "scripts/Configure-WinRM.ps1"
+      ],
+      "cd_files": [
+        "drivers/virtio-win-0.1.171/NetKVM/w10/amd64/*",
+        "drivers/virtio-win-0.1.171/vioserial/w10/amd64/*",
+        "drivers/virtio-win-0.1.171/viostor/w10/amd64/*",
+        "apps/miniccc.exe"
+      ],
+      "headless": "{{ user `headless` }}",
+      "iso_checksum": "{{ user `iso_checksum` }}",
+      "iso_urls": [
+        "{{ user `iso_url` }}"
+      ],
+      "output_directory": "output-{{ user `vm_name` }}",
+      "qemuargs": [
+        [
+          "-m",
+          "{{ user `memory` }}"
+        ],
+        [
+          "-smp",
+          "cpus={{ user `cpus`}}"
+        ],
+        [
+          "-cpu",
+          "Broadwell"
+        ]
+      ],
+      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1",
+      "shutdown_timeout": "30m",
+      "type": "qemu",
+      "vm_name": "{{ user `vm_name` }}",
+      "winrm_username": "vagrant",
+      "winrm_password": "vagrant",
+      "winrm_timeout": "10000s"
+    }
+  ],
+  "provisioners": [
+    {
+      "scripts": [
+        "scripts/Disable-AutoLogin.ps1",
+        "scripts/Disable-Hibernate.ps1",
+        "scripts/Disable-WindowsDefender.ps1",
+        "scripts/Disable-WindowsUpdates.ps1",
+        "scripts/Enable-RDP.ps1",
+        "scripts/Enable-UAC.ps1",
+        "scripts/Password-NoExpiration.ps1"
+      ],
+      "type": "powershell"
+    },
+    {
+      "type": "file",
+      "source": "scripts/phenix-startup.ps1",
+      "destination": "/phenix/phenix-startup.ps1"
+    },
+    {
+      "type": "windows-shell",
+      "inline": "schtasks.exe /create /sc onstart /ru SYSTEM /rl HIGHEST /tn phenix-startup /tr \"powershell.exe -ep bypass C:\\phenix\\phenix-startup.ps1 > C:\\phenix\\phenix-startup.log\" /f"
+    },
+    {
+      "type": "powershell",
+      "inline": "mkdir /minimega -ErrorAction SilentlyContinue",
+      "elevated_user": "vagrant",
+      "elevated_password": "vagrant"
+    },
+    {
+      "type": "windows-shell",
+      "inline": "copy E:\\miniccc.exe C:\\minimega\\miniccc.exe"
+    },
+    {
+      "type": "windows-shell",
+      "inline": "C:\\minimega\\miniccc.exe -install auto-start -logfile C:\\minimega\\miniccc.log -level info"
+    },
+    {
+      "type": "windows-shell",
+      "inline": "net start miniccc",
+      "valid_exit_codes": [0, 2],
+      "pause_before": "5s"
+    },
+    {
+      "type": "windows-restart"
+    }
+  ],
+  "variables": {
+    "cpus": "2",
+    "disk_size": "20480",
+    "headless": "false",
+    "iso_checksum": "sha1:56ab095075be28a90bc0b510835280975c6bb2ce",
+    "iso_url": "https://software-static.download.prss.microsoft.com/dbazure/988969d5-f34g-4e03-ac9d-1f9786c66750/19045.2006.220908-0225.22h2_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
+    "memory": "4096",
+    "vm_name": "windows-10"
+  }
+}
+
