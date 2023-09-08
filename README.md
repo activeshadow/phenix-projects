@@ -5,6 +5,9 @@ different projects. I will continue to update it as time and testing permits.
 
 ## Current Projects
 
+* [caldera-training](caldera-training) - simple experiment to quickly spin up an
+  environment for testing and learning the [MITRE Caldera Adversary Emulation
+  Platform](https://caldera.mitre.org).
 * [mad-emu-lab](mad-emu-lab) - lab component for Module 1 of the free Cybrary
   [MITRE ATT&CK Defender ATT&CK Adversary Emulation training
   course](https://app.cybrary.it/browse/course/mitre-attack-adversary-emulation-fundamentals).

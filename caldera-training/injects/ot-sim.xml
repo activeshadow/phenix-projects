@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<ot-sim>
+  <message-bus>
+    <pull-endpoint>tcp://127.0.0.1:1234</pull-endpoint>
+    <pub-endpoint>tcp://127.0.0.1:5678</pub-endpoint>
+  </message-bus>
+  <cpu>
+    <module name="backplane">ot-sim-message-bus {{config_file}}</module>
+    <module name="logic">ot-sim-logic-module {{config_file}}</module>
+    <module name="modbus">ot-sim-modbus-module {{config_file}}</module>
+    <module name="dnp3">ot-sim-dnp3-module {{config_file}}</module>
+  </cpu>
+  <logic name="PLC-tank-sim">
+    <period>1s</period>
+    <program>
+      <![CDATA[
+        # stay in event state if level is not low enough
+        event = event && level > 7_500
+
+        # only allow inlet valve to be opened again if not in event state
+        setpoint = event ? 0 : inlet_pos
+
+        inflow = ((100 / 60) * setpoint)
+        outflow = ((125 / 60) * outlet_pos)
+
+        # calculate current level of tank
+        level = level + inflow - outflow
+        level = level < 0 ? 0 : level
+
+        # go into event state if tank level too high (or will be too high)
+        event = event || (level + inflow) > 9_500
+
+        # HACK to get inlet/outlet position values to other modules
+        inlet_pos = inlet_pos
+        outlet_pos = outlet_pos
+      ]]>
+    </program>
+    <variables>
+      <event>false</event>
+      <level>0</level>
+      <inlet_pos>1.0</inlet_pos>
+      <outlet_pos>0.35</outlet_pos>
+    </variables>
+    <process-updates>true</process-updates>
+  </logic>
+  <modbus name="modbus-outstation" mode="server">
+    <endpoint>0.0.0.0:502</endpoint>
+    <register type="discrete">
+      <address>10000</address>
+      <tag>event</tag>
+    </register>
+    <register type="input">
+      <address>30000</address>
+      <tag>level</tag>
+      <scaling>0</scaling>
+    </register>
+    <register type="holding">
+      <address>40000</address>
+      <tag>inlet_pos</tag>
+      <scaling>-2</scaling>
+    </register>
+    <register type="holding">
+      <address>40001</address>
+      <tag>outlet_pos</tag>
+      <scaling>-2</scaling>
+    </register>
+  </modbus>
+  <dnp3 name="dnp3-outstation" mode="server">
+    <endpoint>0.0.0.0:20000</endpoint>
+    <outstation name="dnp3-outstation">
+      <local-address>1024</local-address>
+      <remote-address>1</remote-address>
+      <input type="binary">
+        <address>0</address>
+        <tag>event</tag>
+      </input>
+      <input type="analog">
+        <address>0</address>
+        <tag>level</tag>
+      </input>
+      <output type="analog">
+        <address>0</address>
+        <tag>inlet_pos</tag>
+      </output>
+      <output type="analog">
+        <address>1</address>
+        <tag>outlet_pos</tag>
+      </output>
+    </outstation>
+  </dnp3>
+</ot-sim>

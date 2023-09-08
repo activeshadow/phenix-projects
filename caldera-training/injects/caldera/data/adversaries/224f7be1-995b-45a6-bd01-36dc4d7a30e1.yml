@@ -1,0 +1,7 @@
+adversary_id: 224f7be1-995b-45a6-bd01-36dc4d7a30e1
+name: OT DNP3 Demonstration
+description: Demonstration of using DNP3 OT abilities
+atomic_ordering:
+- 316f2be2-3103-4065-a128-50ae3456e7f3 # T0861 - DNP3 Integrity Poll
+objective: 495a9828-cab1-44dd-a0ca-66e58177d8cc
+tags: []

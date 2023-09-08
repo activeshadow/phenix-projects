@@ -1,0 +1,87 @@
+apiVersion: phenix.sandia.gov/v1
+kind: Experiment
+metadata:
+  name: caldera-training
+spec:
+  scenario:
+    apps:
+    - name: tap
+      metadata:
+        taps:
+        - bridge: phenix
+          vlan: hack
+          ip: 10.0.40.254/24
+          externalAccess:
+            enabled: true
+  topology:
+    nodes:
+    - general:
+        hostname: caldera
+      annotations:
+        phenix/startup-autotunnel:
+        - 5901:localhost:vnc
+        - 8888:localhost:8888
+      hardware:
+        drives:
+        - image: caldera.qc2
+        os_type: linux
+        memory: 4096
+        vcpus: 2
+      injections:
+      - src: /phenix/projects/caldera-training/injects/caldera
+        dst: /opt
+      network:
+        interfaces:
+        - address: 10.0.40.10
+          mask: 24
+          gateway: 10.0.40.254
+          name: IF0
+          proto: static
+          type: ethernet
+          vlan: hack
+      type: VirtualMachine
+    - general:
+        hostname: pwn-win
+      annotations:
+        includes-phenix-startup: true
+        phenix/windows-rearm: true
+      hardware:
+        drives:
+        - image: win-10.qc2
+        os_type: windows
+        memory: 4096
+        vcpus: 2
+      injections:
+      - src: /phenix/projects/caldera-training/injects/sandcat.ps1
+        dst: /phenix/startup/90-sandcat.ps1
+      network:
+        interfaces:
+        - address: 10.0.40.200
+          mask: 24
+          gateway: 10.0.40.254
+          name: IF0
+          proto: static
+          type: ethernet
+          vlan: hack
+      type: VirtualMachine
+    - general:
+        hostname: ot-sim
+      hardware:
+        drives:
+        - image: ot-sim.qc2
+        os_type: linux
+        memory: 1024
+        vcpus: 1
+      injections:
+      - src: /phenix/projects/caldera-training/injects/ot-sim.xml
+        dst: /etc/ot-sim/config.xml
+      network:
+        interfaces:
+        - address: 10.0.40.100
+          mask: 24
+          gateway: 10.0.40.254
+          name: IF0
+          proto: static
+          type: ethernet
+          vlan: hack
+      type: VirtualMachine

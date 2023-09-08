@@ -1,0 +1,8 @@
+adversary_id: 3d02e669-f95b-486d-9e8d-d216dd822341
+name: OT Modbus Demonstration
+description: Demonstration of using Modbus OT abilities
+atomic_ordering:
+- bc8961a2-7534-4b2a-bbc3-2456f58243be # T0861 - Point & Tag Identification
+- d6991b6b-d3b2-4398-ad3f-d736ae09acf9 # T0831 - Manipulation of Control
+objective: 495a9828-cab1-44dd-a0ca-66e58177d8cc
+tags: []
