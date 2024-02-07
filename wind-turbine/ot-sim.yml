@@ -52,6 +52,30 @@ spec:
       make -C src/go install
       python3 -m pip install src/python
 
+      cd /
+
+      # Node-RED
+      wget -O installer.sh \
+        https://raw.githubusercontent.com/node-red/linux-installers/master/deb/update-nodejs-and-nodered
+
+      bash ./installer.sh --confirm-root --confirm-install --no-init --skip-pi \
+        && rm installer.sh
+
+      cd /root/.node-red
+      npm install \
+        zeromq@5.3.1 \
+        node-red-dashboard \
+        node-red-contrib-modbus \
+        @node-red-contrib-themes/theme-collection
+
+      mkdir -p /root/.node-red/nodes/ot-sim
+      cp -a /opt/ot-sim/src/js/node-red/* /root/.node-red/nodes/ot-sim
+
+      cd /root/.node-red/nodes/ot-sim
+      npm install
+
+      cd /
+
       rm -rf /usr/local/go
       find /usr/local/bin -xtype l -delete
 
