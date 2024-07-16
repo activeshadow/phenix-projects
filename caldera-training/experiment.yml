@@ -13,6 +13,23 @@ spec:
           ip: 10.0.40.254/24
           externalAccess:
             enabled: true
+    - name: caldera
+      hosts:
+      - hostname: pwn-win
+        metadata:
+          server: caldera:0
+    - name: scorch
+      metadata:
+        components:
+        - name: dnp3
+          type: caldera
+          metadata:
+            server: caldera
+            adversary: OT DNP3 Demonstration
+            facts: OT DNP3 Demonstration
+        runs:
+        - start:
+          - dnp3
   topology:
     nodes:
     - general:
@@ -51,9 +68,6 @@ spec:
         os_type: windows
         memory: 4096
         vcpus: 2
-      injections:
-      - src: /phenix/projects/caldera-training/injects/sandcat.ps1
-        dst: /phenix/startup/90-sandcat.ps1
       network:
         interfaces:
         - address: 10.0.40.200

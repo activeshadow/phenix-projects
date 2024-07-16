@@ -51,6 +51,7 @@ spec:
       git submodule add -b facts https://github.com/activeshadow/caldera-modbus.git plugins/modbus
       git submodule add -b main https://github.com/activeshadow/caldera-dnp3.git plugins/dnp3
       git submodule add -b main https://github.com/activeshadow/caldera-ot.git plugins/ot
+      git submodule add -b main https://github.com/activeshadow/caldera-phenix.git plugins/phenix
 
       cat > /etc/systemd/system/caldera.service <<EOF
       [Unit]
