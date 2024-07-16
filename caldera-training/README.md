@@ -17,6 +17,15 @@ The following steps are required to use this project:
 1. Build the OT-sim VM using phenix
 1. Deploy the project experiment using phenix
 
+> NOTE: this branch of the `phenix-projects` repository uses the recently
+> created `caldera` phenix app and phenix Scorch component, which have not yet
+> been officially released. In order to use them, you must rebuild your local
+> phenix Docker image with updated Docker args to pull in the app and Scorch
+> component. This can be done by adding the `APPS_REPO:
+> github.com/activeshadow/phenix-apps` and `APPS_BRANCH: caldera` Docker args
+> to the `phenix` service in the `docker/docker-compose.yml` file in the phenix
+> repository.
+
 ### Build the Caldera VM Using phenix
 
 The `caldera` directory contains a phenix image config for building the Caldera
