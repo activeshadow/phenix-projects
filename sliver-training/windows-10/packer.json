@@ -10,9 +10,9 @@
         "scripts/Configure-WinRM.ps1"
       ],
       "cd_files": [
-        "drivers/virtio-win-0.1.171/NetKVM/w10/amd64/*",
-        "drivers/virtio-win-0.1.171/vioserial/w10/amd64/*",
-        "drivers/virtio-win-0.1.171/viostor/w10/amd64/*",
+        "drivers/virtio-win/NetKVM/w10/amd64/*",
+        "drivers/virtio-win/vioserial/w10/amd64/*",
+        "drivers/virtio-win/viostor/w10/amd64/*",
         "apps/miniccc.exe"
       ],
       "headless": "{{ user `headless` }}",

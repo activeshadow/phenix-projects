@@ -56,6 +56,12 @@ packer build packer.json
 
 > This step will take quite a while to complete.
 
+> If you do not want to install Packer, the Packer QEMU plugin, and all of the
+> QEMU/KVM dependencies on your host machine, you can elect to use Docker to
+> run Packer by building a Docker image using the Dockerfile located in the
+> windows-10 directory. See the [README](windows-10/README.md) in the
+> windows-10 directory for more details.
+
 Once built, run the following command to make sure the image is located where
 phenix and minimega can access it.
 
