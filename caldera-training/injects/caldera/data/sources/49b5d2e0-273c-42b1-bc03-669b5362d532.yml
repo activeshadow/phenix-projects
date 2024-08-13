@@ -1,0 +1,19 @@
+---
+
+id: 49b5d2e0-273c-42b1-bc03-669b5362d532
+name: FrostyGoop Demonstration
+facts:
+- trait: frostygoop.target.ip
+  value: 10.0.40.100
+- trait: frostygoop.read.address
+  value: 40000
+- trait: frostygoop.read.count
+  value: 2
+- trait: frostygoop.write.address
+  value: 40001
+- trait: frostygoop.write.count
+  value: 1
+- trait: frostygoop.write.value
+  value: 0
+relationships: []
+rules: []

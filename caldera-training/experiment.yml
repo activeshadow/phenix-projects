@@ -27,9 +27,17 @@ spec:
             server: caldera
             adversary: OT DNP3 Demonstration
             facts: OT DNP3 Demonstration
+        - name: frosty
+          type: caldera
+          metadata:
+            server: caldera
+            adversary: FrostyGoop Demonstration
+            facts: FrostyGoop Demonstration
         runs:
         - start:
           - dnp3
+        - start:
+          - frosty
   topology:
     nodes:
     - general:
@@ -51,6 +59,8 @@ spec:
         dst: /root/.config/autostart/Caldera.desktop
       - src: /phenix/projects/caldera-training/injects/firefox-bookmark.json
         dst: /etc/firefox/policies/policies.json
+      - src: /phenix/projects/caldera-training/injects/bustleberm.exe
+        dst: /opt/caldera/plugins/ot/payloads/bustleberm.exe
       network:
         interfaces:
         - address: 10.0.40.10

@@ -64,6 +64,16 @@ sudo mv /phenix/vmdb/ot-sim.qc2 /phenix/images/ot-sim.qc2
 
 ### Deploy the Lab Environment Using phenix
 
+This lab includes an Caldera adversary and fact source for the FrostyGoop
+malware abilities present in the Caldera OT plugin that is part of the default
+Caldera image in phenix. In order to use the FrostyGoop malware abilities, users
+must manually download and add the `bustleberm.exe` payload to the `injects`
+directory. This is the FrostyGoop malware sample that can be downloaded from
+https://bazaar.abuse.ch. Be sure to download the sample with the following
+signature.
+
+`5d2e4fd08f81e3b2eb2f3eaae16eb32ae02e760afc36fa17f4649322f6da53fb`
+
 The root directory of this repo contains a phenix experiment config for
 deploying the lab environment. To deploy, run the following commands.
 

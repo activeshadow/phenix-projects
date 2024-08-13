@@ -1,0 +1,8 @@
+adversary_id: d74855e5-dd44-44f3-906b-f01b4e4349ce
+name: FrostyGoop Demonstration
+description: Demonstration of the FrostyGoop OT Malware
+atomic_ordering:
+- 66ff8be0-bee5-4e96-8f66-8c4ebcdf7035 # T0802 - FrostyGoop Read
+- 5b773097-b5b7-439c-9145-210b58993bad # T0831 - FrostyGoop Write
+objective: 495a9828-cab1-44dd-a0ca-66e58177d8cc
+tags: []
