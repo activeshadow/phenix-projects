@@ -33,6 +33,10 @@
         [
           "-cpu",
           "Broadwell"
+        ],
+        [
+          "-display",
+          "none"
         ]
       ],
       "shutdown_command": "shutdown /s /t 10 /f /d p:4:1",
@@ -94,7 +98,7 @@
     "cpus": "2",
     "disk_size": "20480",
     "headless": "false",
-    "iso_checksum": "sha1:56ab095075be28a90bc0b510835280975c6bb2ce",
+    "iso_checksum": "sha1:753568eaf18ce39ad2cfd29083ddb0e32a65ca85",
     "iso_url": "https://software-static.download.prss.microsoft.com/dbazure/988969d5-f34g-4e03-ac9d-1f9786c66750/19045.2006.220908-0225.22h2_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
     "memory": "4096",
     "vm_name": "windows-10"

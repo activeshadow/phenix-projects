@@ -18,10 +18,14 @@ Docker container.
 alias packer='docker run -it --rm -v `pwd`:/workspace -w /workspace --network host --name packer --privileged --cap-add ALL -e PACKER_CACHE_DIR=packer_cache -e PACKER_PLUGIN_PATH=.plugins packer'
 ```
 
+Run the following command from this directory to install the QEMU Packer Plugin.
+
+```
+packer plugins install github.com/hashicorp/qemu
+```
+
 Run the following command from this directory to build the Windows 10 VM image.
 
 ```
 packer build packer.json
-```
-```
 ```

@@ -38,6 +38,15 @@ and unarchived into the `drivers` directory. Depending on which version of the
 drivers were downloaded, the `cd_files` variable may need to be updated to
 reference the correct version.
 
+```
+curl --output-dir /tmp --remote-name \
+  https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.266-1/virtio-win-0.1.266.iso
+
+sudo mount -o loop /tmp/virtio-win-0.1.266.iso /mnt
+
+mkdir -p windows-10/drivers/virtio-win && cp -a /mnt/* windows-10/drivers/virtio-win
+```
+
 As mentioned in the main [README](../README.md), a recent copy of `miniccc.exe`
 needs to be placed in the `windows-10/apps` directory prior to running Packer.
 The easiest way to do this is to run the following command from the current
