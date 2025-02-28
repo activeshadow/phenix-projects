@@ -41,9 +41,10 @@ spec:
         pkg-config python3-dev wget
 
       # Golang
-      wget --no-check-certificate -O go.tgz https://golang.org/dl/go1.20.linux-amd64.tar.gz \
+      wget --no-check-certificate -O go.tgz https://golang.org/dl/go1.24.0.linux-amd64.tar.gz \
         && tar -C /usr/local -xzf go.tgz && rm go.tgz \
-        && ln -s /usr/local/go/bin/* /usr/local/bin
+        && ln -s /usr/local/go/bin/* /usr/local/bin \
+        && export GOROOT=/usr/local/go
 
       # ot-sim
       git clone https://github.com/patsec/ot-sim.git /opt/ot-sim
