@@ -1,0 +1,11 @@
+{
+  "policies": {
+    "Bookmarks": [
+      {
+        "Title": "Caldera",
+        "URL": "http://10.0.40.10:8888",
+        "Placement": "toolbar"
+      }
+    ]
+  }
+}
