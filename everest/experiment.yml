@@ -1,0 +1,47 @@
+apiVersion: phenix.sandia.gov/v1
+kind: Experiment
+metadata:
+  name: everest
+spec:
+  topology:
+    nodes:
+    - general:
+        hostname: evse
+      hardware:
+        drives:
+        - image: everest.qc2
+        os_type: linux
+        memory: 1024
+        vcpus: 1
+      injections:
+      - src: /phenix/projects/everest/injects/config-sil-evse.yaml
+        dst: /usr/local/etc/everest/default.yaml
+      - src: /phenix/projects/everest/injects/start-everest.sh
+        dst: /root/start-everest.sh
+      network:
+        interfaces:
+        - name: IF0
+          proto: manual
+          type: ethernet
+          vlan: charger
+      type: VirtualMachine
+    - general:
+        hostname: ev
+      hardware:
+        drives:
+        - image: everest.qc2
+        os_type: linux
+        memory: 1024
+        vcpus: 1
+      injections:
+      - src: /phenix/projects/everest/injects/config-sil-ev.yaml
+        dst: /usr/local/etc/everest/default.yaml
+      - src: /phenix/projects/everest/injects/start-everest.sh
+        dst: /root/start-everest.sh
+      network:
+        interfaces:
+        - name: IF0
+          proto: manual
+          type: ethernet
+          vlan: charger
+      type: VirtualMachine

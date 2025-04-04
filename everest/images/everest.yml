@@ -1,0 +1,127 @@
+apiVersion: phenix.sandia.gov/v1
+kind: Image
+metadata:
+  name: everest
+spec:
+  compress: false
+  deb_append: ' --components=main,restricted,universe,multiverse'
+  format: qcow2
+  mirror: http://archive.ubuntu.com/ubuntu/
+  packages:
+    - build-essential
+    - clang-format
+    - cmake
+    - curl
+    - dbus
+    - doxygen
+    - git
+    - init
+    - initramfs-tools
+    - iproute2
+    - iputils-ping
+    - isc-dhcp-client
+    - less
+    - libboost-dev
+    - libboost-filesystem-dev
+    - libboost-log-dev
+    - libboost-program-options-dev
+    - libboost-thread-dev
+    - libcap-dev
+    - libevent-dev
+    - libpcap-dev
+    - libsqlite3-dev
+    - libssl-dev
+    - linux-headers-generic
+    - linux-image-generic
+    - net-tools
+    - netbase
+    - nodejs
+    - openssh-server
+    - pkg-config
+    - python3-dev
+    - python3-pip
+    - python3-venv
+    - tcpdump
+    - tree
+    - vim
+    - wget
+    - xz-utils
+  release: noble
+  script_order:
+    - INSTALL_EVEREST
+    - POSTBUILD_APT_CLEANUP
+    - POSTBUILD_NO_ROOT_PASSWD
+    - POSTBUILD_PHENIX_HOSTNAME
+    - POSTBUILD_PHENIX_BASE
+  scripts:
+    INSTALL_EVEREST: |
+      DEBIAN_FRONTEND=noninteractive
+
+      # Installing npm during the bootstrap process breaks, so we do it here.
+      apt update && apt install -y npm
+
+      python3 -m pip install --no-cache-dir --break-system-packages \
+        "git+https://github.com/everest/everest-dev-environment@main#egg=edm_tool&subdirectory=dependency_manager"
+
+      git clone https://github.com/patsec/everest-workspace.git /opt/everest
+
+      cd /opt/everest
+
+      edm init --workspace . --config workspace-config.yaml
+      CMAKE_PREFIX_PATH=/opt/everest cmake -S everest-core -B everest-core/build --install-prefix /usr/local
+      cmake --build everest-core/build -j8 --target install
+
+      python3 -m pip install --no-cache-dir --break-system-packages \
+        aiofile cryptography environs netifaces psutil pydantic
+    POSTBUILD_APT_CLEANUP: |
+      apt clean || apt-get clean || echo "unable to clean apt cache"
+      rm -rf /var/lib/apt/lists/*
+    POSTBUILD_NO_ROOT_PASSWD: |
+      sed -i 's/nullok_secure/nullok/' /etc/pam.d/common-auth
+      sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+      sed -i 's/#PermitEmptyPasswords no/PermitEmptyPasswords yes/' /etc/ssh/sshd_config
+      sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+      sed -i 's/PermitEmptyPasswords no/PermitEmptyPasswords yes/' /etc/ssh/sshd_config
+      passwd -d root
+    POSTBUILD_PHENIX_BASE: |
+      cat > /etc/systemd/system/phenix.service <<EOF
+      [Unit]
+      Description=phenix startup service
+      After=network.target systemd-hostnamed.service
+      [Service]
+      Environment=LD_LIBRARY_PATH=/usr/local/lib
+      ExecStart=/usr/local/bin/phenix-start.sh
+      RemainAfterExit=true
+      StandardOutput=journal
+      Type=oneshot
+      [Install]
+      WantedBy=multi-user.target
+      EOF
+      mkdir -p /etc/systemd/system/multi-user.target.wants
+      ln -s /etc/systemd/system/phenix.service /etc/systemd/system/multi-user.target.wants/phenix.service
+      mkdir -p /usr/local/bin
+      cat > /usr/local/bin/phenix-start.sh <<EOF
+      #!/bin/bash
+      for file in /etc/phenix/startup/*; do
+        echo \$file
+        bash \$file
+      done
+      EOF
+      chmod +x /usr/local/bin/phenix-start.sh
+      mkdir -p /etc/phenix/startup
+    POSTBUILD_PHENIX_HOSTNAME: |
+      echo "phenix" > /etc/hostname
+      sed -i 's/127.0.1.1 .*/127.0.1.1 phenix/' /etc/hosts
+      cat > /etc/motd <<EOF
+
+      ██████╗ ██╗  ██╗███████╗███╗  ██╗██╗██╗  ██╗
+      ██╔══██╗██║  ██║██╔════╝████╗ ██║██║╚██╗██╔╝
+      ██████╔╝███████║█████╗  ██╔██╗██║██║ ╚███╔╝
+      ██╔═══╝ ██╔══██║██╔══╝  ██║╚████║██║ ██╔██╗
+      ██║     ██║  ██║███████╗██║ ╚███║██║██╔╝╚██╗
+      ╚═╝     ╚═╝  ╚═╝╚══════╝╚═╝  ╚══╝╚═╝╚═╝  ╚═╝
+
+      EOF
+      echo "\nBuilt with phenix image on $(date)\n\n" >> /etc/motd
+  size: 30G
+  variant: minbase

@@ -1,0 +1,36 @@
+active_modules:
+  ev_manager:
+    module: JsEvManager
+    config_module:
+      connector_id: 1
+      use_pipes: true
+      auto_enable: true
+      auto_exec: true
+      auto_exec_commands: sleep 1;iec_wait_pwr_ready;sleep 1;draw_power_regulated 16,3;sleep 30;unplug
+    connections:
+      ev_board_support:
+        - module_id: powerpath
+          implementation_id: ev_board_support
+      slac:
+        - module_id: slac
+          implementation_id: ev
+      ev:
+        - module_id: iso15118_car
+          implementation_id: ev
+  powerpath:
+    module: JsYetiEvSimulator
+    config_module:
+      use_pipes: true
+  slac:
+    module: JsSlacEvSimulator
+    config_module:
+      use_pipes: true
+  iso15118_car:
+    module: PyEvJosev
+    config_module:
+      device: auto
+      supported_ISO15118_2: true
+      tls_active: true
+      is_cert_install_needed: true
+  system:
+    module: System

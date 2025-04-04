@@ -1,0 +1,152 @@
+active_modules:
+  evse_manager:
+    module: EvseManager
+    config_module:
+      ac_enforce_hlc: false
+      ac_hlc_enabled: true
+      ac_hlc_use_5percent: false
+      ac_nominal_voltage: 230
+      charge_mode: AC
+      connector_id: 1
+      ev_receipt_required: false
+      evse_id: DE*PNX*E12345*1
+      has_ventilation: true
+      max_current_import_A: 32
+      max_current_export_A: 32
+      payment_enable_contract: true
+      payment_enable_eim: true
+      session_logging: true
+      session_logging_path: /tmp/everest-logs
+      session_logging_xml: false
+      switch_3ph1ph_delay_s: 5
+      switch_3ph1ph_cp_state: X1
+    connections:
+      bsp:
+        - module_id: powerpath
+          implementation_id: board_support
+      powermeter_grid_side:
+        - module_id: powerpath
+          implementation_id: powermeter
+      ac_rcd:
+        - module_id: powerpath
+          implementation_id: rcd
+      connector_lock:
+        - module_id: powerpath
+          implementation_id: connector_lock
+      slac:
+        - module_id: slac
+          implementation_id: evse
+      hlc:
+        - module_id: iso15118_charger
+          implementation_id: charger
+  powerpath:
+    module: JsYetiEvseSimulator
+    config_module:
+      connector_id: 1
+      use_pipes: true
+  slac:
+    module: JsSlacEvseSimulator
+    config_module:
+      use_pipes: true
+  iso15118_charger:
+    module: EvseV2G
+    config_module:
+      device: auto
+      tls_security: allow
+      supported_DIN70121: false
+    connections:
+      security:
+        - module_id: evse_security
+          implementation_id: main
+  api:
+    module: API
+    connections:
+      evse_manager:
+        - module_id: evse_manager
+          implementation_id: evse
+      error_history:
+        - module_id: error_history
+          implementation_id: error_history
+  error_history:
+    module: ErrorHistory
+    config_implementation:
+      error_history:
+        database_path: /tmp/error_history.db
+  auth:
+    module: Auth
+    config_module:
+      connection_timeout: 10
+      prioritize_authorization_over_stopping_transaction: true
+      selection_algorithm: FindFirst
+      ignore_connector_faults: true
+    connections:
+      evse_manager:
+        - module_id: evse_manager
+          implementation_id: evse
+      token_provider:
+        - module_id: token_provider
+          implementation_id: main
+      token_validator:
+        - module_id: token_validator
+          implementation_id: main
+  energy_manager:
+    module: EnergyManager
+    config_module:
+      switch_3ph1ph_while_charging_mode: Both
+      switch_3ph1ph_max_nr_of_switches_per_session: 5
+      switch_3ph1ph_time_hysteresis_s: 20
+      switch_3ph1ph_power_hysteresis_W: 1000
+      switch_3ph1ph_switch_limit_stickyness: SinglePhase
+      schedule_interval_duration: 60
+      schedule_total_duration: 10
+      debug: false
+    connections:
+      energy_trunk:
+        - module_id: grid_connection_point
+          implementation_id: energy_grid
+  grid_connection_point:
+    module: EnergyNode
+    config_module:
+      fuse_limit_A: 40
+      phase_count: 3
+    connections:
+      energy_consumer:
+        - module_id: evse_manager
+          implementation_id: energy_grid
+  evse_security:
+    module: EvseSecurity
+    config_module:
+      private_key_password: "123456"
+  persistent_store:
+    module: PersistentStore
+    config_module:
+      sqlite_db_file_path: /tmp/everest_persistent_store.db
+  setup:
+    module: Setup
+    config_module:
+      initialized_by_default: true
+      localization: true
+      online_check_host: lfenergy.org
+      setup_simulation: true
+      setup_wifi: false
+    connections:
+      store:
+        - module_id: persistent_store
+          implementation_id: main
+  token_provider:
+    module: DummyTokenProvider
+    config_implementation:
+      main:
+        timeout: 10
+        token: DEADBEEF
+    connections:
+      evse:
+        - module_id: evse_manager
+          implementation_id: evse
+  token_validator:
+    module: DummyTokenValidator
+    config_implementation:
+      main:
+        sleep: 0.25
+        validation_reason: Token seems valid
+        validation_result: Accepted
