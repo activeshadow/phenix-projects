@@ -23,7 +23,7 @@ Caldera and OT-sim for use in this experiment.
 
 ```
 cd /phenix/images
-oras pull ghcr.io/activeshadow/phenix-experiments/caldera.qc2:main
+oras pull ghcr.io/activeshadow/phenix-projects/caldera.qc2:main
 oras pull ghcr.io/patsec/ot-sim/ot-sim.qc2:main
 ```
 

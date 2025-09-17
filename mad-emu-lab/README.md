@@ -22,7 +22,7 @@ Kali for use in this experiment.
 
 ```
 cd /phenix/images
-oras pull ghcr.io/activeshadow/phenix-experiments/mad-emu-kali.qc2:main
+oras pull ghcr.io/activeshadow/phenix-projects/mad-emu-kali.qc2:main
 ```
 
 While not required, it is sometimes useful to have the minimega `miniccc` agent

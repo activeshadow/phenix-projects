@@ -40,7 +40,7 @@ Grafana and OT-sim for use in this experiment.
 
 ```
 cd /phenix/images
-oras pull ghcr.io/activeshadow/phenix-experiments/grafana.qc2:main
+oras pull ghcr.io/activeshadow/phenix-projects/grafana.qc2:main
 oras pull ghcr.io/patsec/ot-sim/ot-sim.qc2:main
 ```
 
