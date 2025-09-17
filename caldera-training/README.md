@@ -12,55 +12,34 @@ Emulation Platform](https://caldera.mitre.org). It spins up the following VMs:
 
 The following steps are required to use this project:
 
-1. Build the Caldera VM using phenix
+1. Download the Caldera and OT-sim VMs using Oras
 1. Build the [sliver-training](../sliver-training) Windows 10 VM using Packer
-1. Build the [wind-turbine](../wind-turbine) OT-sim VM using phenix
 1. Deploy the project experiment using phenix
 
-### Build the Caldera VM Using phenix
+### Download the Caldera and OT-sim VMs Using Oras
 
-phenix includes a default image config that can be used for building the Caldera
-VM image. To build the image using the config, run the following commands.
-
-```
-docker exec -it phenix phenix image build -x -c -o /phenix/vmdb caldera
-docker exec -it phenix phenix image inject-miniexe /opt/minimega/bin/miniccc /phenix/vmdb/caldera.qc2
-```
-
-> This step will take quite a while to complete.
-
-Once built, run the following command to make sure the image is located where
-phenix and minimega can access it.
+The [Oras](https://oras.land) CLI can be used to download pre-built images of
+Caldera and OT-sim for use in this experiment.
 
 ```
-sudo mv /phenix/vmdb/caldera.qc2 /phenix/images/caldera.qc2
+cd /phenix/images
+oras pull ghcr.io/activeshadow/phenix-experiments/caldera.qc2:main
+oras pull ghcr.io/patsec/ot-sim/ot-sim.qc2:main
+```
+
+While not required, it is sometimes useful to have the minimega `miniccc` agent
+running in the Caldera and OT-sim VMs. The following commands will ensure the
+latest version of `miniccc` is installed in the VM images downloaded above.
+
+```
+ph image inject-miniexe /opt/minimega/bin/miniccc /phenix/images/caldera.qc2
+ph image inject-miniexe /opt/minimega/bin/miniccc /phenix/images/ot-sim.qc2
 ```
 
 ### Build the sliver-training Windows 10 VM Using Packer
 
 See the [sliver-training README](../sliver-training/README.md) for instructions
 on how to build the Windows 10 VM.
-
-### Build the wind-turbine OT-sim VM Using phenix
-
-The [wind-turbine](../wind-turbine) project includes a phenix image config for
-building the OT-sim VM image using phenix. To build the image using the config,
-run the following commands.
-
-```
-docker exec -it phenix phenix config create /phenix/projects/wind-turbine/ot-sim.yml
-docker exec -it phenix phenix image build -x -c -o /phenix/vmdb ot-sim
-docker exec -it phenix phenix image inject-miniexe /opt/minimega/bin/miniccc /phenix/vmdb/ot-sim.qc2
-```
-
-> This step will take quite a while to complete.
-
-Once built, run the following command to make sure the image is located where
-phenix and minimega can access it.
-
-```
-sudo mv /phenix/vmdb/ot-sim.qc2 /phenix/images/ot-sim.qc2
-```
 
 ### Deploy the Lab Environment Using phenix
 

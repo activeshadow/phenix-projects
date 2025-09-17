@@ -11,9 +11,27 @@ lab. This repo helps students setup their own lab using the
 
 The following steps are required to use this project:
 
+1. Download the lab Kali VM using Oras
 1. Build the lab Active Directory Controller VM using Packer
-1. Build the lab Kali VM using phenix
 1. Deploy the lab environment using phenix
+
+### Download the Lab Kali VM Using Oras
+
+The [Oras](https://oras.land) CLI can be used to download a pre-built image of
+Kali for use in this experiment.
+
+```
+cd /phenix/images
+oras pull ghcr.io/activeshadow/phenix-experiments/mad-emu-kali.qc2:main
+```
+
+While not required, it is sometimes useful to have the minimega `miniccc` agent
+running in the Kali VM. The following command will ensure the latest version of
+`miniccc` is installed in the VM image downloaded above.
+
+```
+ph image inject-miniexe /opt/minimega/bin/miniccc /phenix/images/mad-emu-kali.qc2
+```
 
 ### Build the Lab Active Directory Controller VM Using Packer
 
@@ -59,27 +77,6 @@ phenix and minimega can access it.
 
 ```
 sudo mv output-mad-emu-dc/mad-emu-dc /phenix/images/mad-emu-dc.qc2
-```
-
-### Build the Lab Kali VM Using phenix
-
-The `kali` directory contains a phenix image config for building the Kali VM
-image using phenix. To build the Kali VM image using the config, run the
-following commands.
-
-```
-docker exec -it phenix phenix config create /phenix/projects/mad-emu-lab/kali/mad-emu-kali.yml
-docker exec -it phenix phenix image build -x -c -o /phenix/vmdb mad-emu-kali
-docker exec -it phenix phenix image inject-miniexe /opt/minimega/bin/miniccc /phenix/vmdb/mad-emu-kali.qc2
-```
-
-> This step will take quite a while to complete.
-
-Once built, run the following command to make sure the image is located where
-phenix and minimega can access it.
-
-```
-sudo mv /phenix/vmdb/mad-emu-kali.qc2 /phenix/images/mad-emu-kali.qc2
 ```
 
 ### Deploy the Lab Environment Using phenix

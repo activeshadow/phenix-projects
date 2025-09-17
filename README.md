@@ -35,8 +35,20 @@ cd phenix/docker
 docker-compose up --build -d phenix
 ```
 
-> Note that when Docker Compose is used to run phēnix and minimega, both
-> containers have access to `/phenix` on the host.
+The phēnix UI can now be accessed at http://localhost:3000.
+
+> [!NOTE]
+> When Docker Compose is used to run phēnix and minimega, both containers have
+> access to `/phenix` on the host.
+
+Most of the phenix- and minimega-related commands throughout each of the
+experiment READMEs assume the following aliases have been configured in bash (or
+zsh, or...).
+
+```
+alias ph="docker exec -it phenix phenix"
+alias mm="docker exec -it minimega mm"
+```
 
 Most of the Packer configurations present in this repo will require a recent
 copy of `miniccc.exe` to be copied into their `apps` directory. The easiest way
@@ -47,7 +59,11 @@ Docker container deployed above.
 docker cp minimega:/opt/minimega/bin/miniccc.exe path/to/apps/dir
 ```
 
-The phēnix UI can now be accessed at http://localhost:3000.
+> [!IMPORTANT]
+> All of the experiments require VM images that are pre-built and available for
+> download using [Oras](https://oras.land). Refer to the [Oras installation
+> docs](https://oras.land/docs/installation) or your operating system's package
+> manager for how to install the `oras` CLI.
 
 ### Clone this Repo to `/phenix/projects`
 
