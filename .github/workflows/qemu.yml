@@ -13,7 +13,7 @@ jobs:
       - name: Caldera Image Build
         run: |
           docker run --rm --privileged \
-            -v ${{ github.workspace }}:/workspace \
+            -v ${{ github.workspace }}:/workspace -v /dev:/dev \
             ghcr.io/activeshadow/sceptre-phenix/phenix:main \
             phenix --store.endpoint=bolt:///workspace/store.bdb image build -x -c -o /workspace PHENIX-caldera
           mv PHENIX-caldera.qc2 caldera.qc2
@@ -35,7 +35,7 @@ jobs:
             ghcr.io/activeshadow/sceptre-phenix/phenix:main \
             phenix --store.endpoint=bolt:///workspace/store.bdb config create /workspace/wind-turbine/grafana.yml
           docker run --rm --privileged \
-            -v ${{ github.workspace }}:/workspace \
+            -v ${{ github.workspace }}:/workspace -v /dev:/dev \
             ghcr.io/activeshadow/sceptre-phenix/phenix:main \
             phenix --store.endpoint=bolt:///workspace/store.bdb image build -x -c -o /workspace grafana
       - name: Push Image to Registry
@@ -56,7 +56,7 @@ jobs:
             ghcr.io/activeshadow/sceptre-phenix/phenix:main \
             phenix --store.endpoint=bolt:///workspace/store.bdb config create /workspace/mad-emu-lab/kali/mad-emu-kali.yml
           docker run --rm --privileged \
-            -v ${{ github.workspace }}:/workspace \
+            -v ${{ github.workspace }}:/workspace -v /dev:/dev \
             ghcr.io/activeshadow/sceptre-phenix/phenix:main \
             phenix --store.endpoint=bolt:///workspace/store.bdb image build -x -c -o /workspace mad-emu-kali
       - name: Push Image to Registry
@@ -77,7 +77,7 @@ jobs:
             ghcr.io/activeshadow/sceptre-phenix/phenix:main \
             phenix --store.endpoint=bolt:///workspace/store.bdb config create /workspace/sliver-training/sliver/sliver.yml
           docker run --rm --privileged \
-            -v ${{ github.workspace }}:/workspace \
+            -v ${{ github.workspace }}:/workspace -v /dev:/dev \
             ghcr.io/activeshadow/sceptre-phenix/phenix:main \
             phenix --store.endpoint=bolt:///workspace/store.bdb image build -x -c -o /workspace sliver
       - name: Push Image to Registry
