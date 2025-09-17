@@ -85,8 +85,8 @@ The root directory of this repo contains a phenix experiment config for
 deploying the lab environment. To deploy, run the following commands.
 
 ```
-docker exec -it phenix phenix config create /phenix/projects/mad-emu-lab/experiment.yml
-docker exec -it phenix phenix experiment start mad-emu
+ph config create /phenix/projects/mad-emu-lab/experiment.yml
+ph experiment start mad-emu
 ```
 
 Once deployed, you can access the experiment and VMs by browsing to

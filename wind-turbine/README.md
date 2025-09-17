@@ -59,8 +59,8 @@ The root directory of this repo contains a phenix experiment config for
 deploying the lab environment. To deploy, run the following commands.
 
 ```
-docker exec -it phenix phenix config create /phenix/projects/wind-turbine/experiment.yml
-docker exec -it phenix phenix experiment start wind-turbine
+ph config create /phenix/projects/wind-turbine/experiment.yml
+ph experiment start wind-turbine
 ```
 
 Once deployed, you can access the experiment and VMs by browsing to
