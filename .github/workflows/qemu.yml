@@ -1,0 +1,86 @@
+name: Build Experiment Images
+on:
+  push:
+    branches: ["main"]
+jobs:
+  build-caldera:
+    name: Build Caldera VM Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-docker-action@v4
+      - uses: oras-project/setup-oras@v1
+      - name: Caldera Image Build
+        run: |
+          docker run --rm --privileged \
+            -v ${{ github.workspace }}:/workspace \
+            ghcr.io/activeshadow/sceptre-phenix/phenix:main \
+            phenix --store.endpoint=bolt:///workspace/store.bdb image build -x -c -o /workspace PHENIX-caldera
+          mv PHENIX-caldera.qc2 caldera.qc2
+      - name: Push Image to Registry
+        run: |
+          oras login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} ghcr.io
+          oras push "ghcr.io/${{ github.repository }}/caldera.qc2:${{ github.ref_name }},${GITHUB_SHA:0:7}" caldera.qc2
+  build-grafana:
+    name: Build Grafana VM Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-docker-action@v4
+      - uses: oras-project/setup-oras@v1
+      - name: Grafana Image Build
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            ghcr.io/activeshadow/sceptre-phenix/phenix:main \
+            phenix --store.endpoint=bolt:///workspace/store.bdb config create /workspace/wind-turbine/grafana.yml
+          docker run --rm --privileged \
+            -v ${{ github.workspace }}:/workspace \
+            ghcr.io/activeshadow/sceptre-phenix/phenix:main \
+            phenix --store.endpoint=bolt:///workspace/store.bdb image build -x -c -o /workspace grafana
+      - name: Push Image to Registry
+        run: |
+          oras login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} ghcr.io
+          oras push "ghcr.io/${{ github.repository }}/grafana.qc2:${{ github.ref_name }},${GITHUB_SHA:0:7}" grafana.qc2
+  build-mad-emu-kali:
+    name: Build MAD Emulation Lab Kali VM Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-docker-action@v4
+      - uses: oras-project/setup-oras@v1
+      - name: mad-emu-kali Image Build
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            ghcr.io/activeshadow/sceptre-phenix/phenix:main \
+            phenix --store.endpoint=bolt:///workspace/store.bdb config create /workspace/mad-emu-lab/kali/mad-emu-kali.yml
+          docker run --rm --privileged \
+            -v ${{ github.workspace }}:/workspace \
+            ghcr.io/activeshadow/sceptre-phenix/phenix:main \
+            phenix --store.endpoint=bolt:///workspace/store.bdb image build -x -c -o /workspace mad-emu-kali
+      - name: Push Image to Registry
+        run: |
+          oras login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} ghcr.io
+          oras push "ghcr.io/${{ github.repository }}/mad-emu-kali.qc2:${{ github.ref_name }},${GITHUB_SHA:0:7}" mad-emu-kali.qc2
+  build-sliver:
+    name: Build Sliver VM Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-docker-action@v4
+      - uses: oras-project/setup-oras@v1
+      - name: Sliver Image Build
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            ghcr.io/activeshadow/sceptre-phenix/phenix:main \
+            phenix --store.endpoint=bolt:///workspace/store.bdb config create /workspace/sliver-training/sliver/sliver.yml
+          docker run --rm --privileged \
+            -v ${{ github.workspace }}:/workspace \
+            ghcr.io/activeshadow/sceptre-phenix/phenix:main \
+            phenix --store.endpoint=bolt:///workspace/store.bdb image build -x -c -o /workspace sliver
+      - name: Push Image to Registry
+        run: |
+          oras login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} ghcr.io
+          oras push "ghcr.io/${{ github.repository }}/sliver.qc2:${{ github.ref_name }},${GITHUB_SHA:0:7}" sliver.qc2

@@ -3,10 +3,12 @@ kind: Image
 metadata:
   name: sliver
 spec:
-  compress: true
-  deb_append: ' --components=main,contrib,non-free'
   format: qcow2
   mirror: http://http.kali.org/kali
+  components:
+  - main
+  - contrib
+  - non-free
   packages:
   - curl
   - dbus
@@ -23,7 +25,6 @@ spec:
   - openssh-server
   - vim
   - xserver-xorg
-  ramdisk: false
   release: kali
   script_order:
   - POSTBUILD_KALI
@@ -81,4 +82,3 @@ spec:
       echo "\nBuilt with love by phenix using sliver image on $(date)\n\n" >> /etc/motd
   size: 50G
   variant: minbase
-

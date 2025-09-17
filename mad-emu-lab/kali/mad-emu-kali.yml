@@ -3,10 +3,12 @@ kind: Image
 metadata:
   name: mad-emu-kali
 spec:
-  compress: true
-  deb_append: ' --components=main,contrib,non-free'
   format: qcow2
   mirror: http://http.kali.org/kali
+  components:
+  - main
+  - contrib
+  - non-free
   packages:
   - curl
   - dbus
@@ -42,7 +44,7 @@ spec:
       echo "attacker ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/attacker
       chmod 0440 /etc/sudoers.d/attacker
 
-      python3 -m pip install -Iv pylnk3==0.4.2
+      python3 -m pip install --break-system-packages -Iv pylnk3==0.4.2
 
       mkdir -p /etc/systemd/system/multi-user.target.wants
       ln -s /lib/systemd/system/ssh.service /etc/systemd/system/multi-user.target.wants/ssh.service

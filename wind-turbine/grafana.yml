@@ -3,9 +3,13 @@ kind: Image
 metadata:
   name: grafana
 spec:
-  deb_append: ' --components=main,restricted,universe,multiverse'
   format: qcow2
-  mirror: http://us.archive.ubuntu.com/ubuntu/
+  mirror: http://ftp.us.debian.org/debian/
+  components:
+  - main
+  - restricted
+  - universe
+  - multiverse
   packages:
   - curl
   - dbus
@@ -19,8 +23,9 @@ spec:
   - linux-image-generic
   - net-tools
   - netbase
+  - openssh-server
   - vim
-  release: focal
+  release: bookworm
   script_order:
   - POSTBUILD_NO_ROOT_PASSWD
   - POSTBUILD_PHENIX_HOSTNAME
@@ -87,4 +92,3 @@ spec:
       echo "\nBuilt with love using phenix image on $(date)\n\n" >> /etc/motd
   size: 50G
   variant: minbase
-
