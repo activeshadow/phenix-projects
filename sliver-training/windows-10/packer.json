@@ -20,7 +20,7 @@
       "iso_urls": [
         "{{ user `iso_url` }}"
       ],
-      "output_directory": "output-{{ user `vm_name` }}",
+      "output_directory": "OUTPUT",
       "qemuargs": [
         [
           "-m",
@@ -98,11 +98,11 @@
   "variables": {
     "cpus": "2",
     "disk_size": "20480",
-    "headless": "false",
+    "headless": "true",
     "iso_checksum": "sha1:753568eaf18ce39ad2cfd29083ddb0e32a65ca85",
     "iso_url": "https://software-static.download.prss.microsoft.com/dbazure/988969d5-f34g-4e03-ac9d-1f9786c66750/19045.2006.220908-0225.22h2_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
     "memory": "4096",
-    "vm_name": "windows-10"
+    "vm_name": "windows-10.qc2"
   }
 }
 

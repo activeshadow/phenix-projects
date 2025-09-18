@@ -1,4 +1,4 @@
-name: Build Experiment Images
+name: Build Linux Images
 on:
   push:
     branches: ["main"]

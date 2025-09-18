@@ -1,0 +1,59 @@
+name: Build Windows Images
+on:
+  push:
+    branches: [packer]
+jobs:
+  build-win-10:
+    name: Build Windows 10 VM Image
+    runs-on: [self-hosted, packer]
+    env:
+      PACKER_CACHE_DIR: packer_cache
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-packer@v3
+      - name: Install Packer QEMU Plugin
+        run: |
+          packer plugins install github.com/hashicorp/qemu
+      - uses: oras-project/setup-oras@v1
+      - name: Build Cache Keys
+        run: |
+          WIN_10_CACHE_KEY=windows-10-iso
+          echo "WIN_10_CACHE_KEY=${WIN_10_CACHE_KEY}" >> $GITHUB_ENV
+          VIRTIO_CACHE_KEY=virtio-win-0.1.266
+          echo "VIRTIO_CACHE_KEY=${VIRTIO_CACHE_KEY}" >> $GITHUB_ENV
+      - name: Restore ISO
+        id: restore-iso
+        uses: corca-ai/local-cache@v2
+        with:
+          path: sliver-training/windows-10/${{ env.PACKER_CACHE_DIR }}
+          key: ${{ env.WIN_10_CACHE_KEY }}
+          base: /home/runner/.cache
+      - name: Restore VirtIO
+        id: restore-virtio
+        uses: corca-ai/local-cache@v2
+        with:
+          path: sliver-training/windows-10/drivers/virtio-win
+          key: ${{ env.VIRTIO_CACHE_KEY }}
+          base: /home/runner/.cache
+      - name: Download VirtIO Drivers
+        if: steps.restore-virtio.outputs.cache-hit != 'true'
+        run: |
+           curl --output-dir /tmp --remote-name \
+             https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.266-1/virtio-win-0.1.266.iso
+           sudo mount -o loop /tmp/virtio-win-0.1.266.iso /mnt
+           mkdir -p sliver-training/windows-10/drivers/virtio-win && cp -a /mnt/* sliver-training/windows-10/drivers/virtio-win
+           sudo umount /mnt
+      - name: Download miniccc Agent
+        run: |
+          docker rm minimega || true
+          docker create --name minimega ghcr.io/sandia-minimega/minimega:master
+          docker cp minimega:/opt/minimega/bin/miniccc.exe sliver-training/windows-10/apps/miniccc.exe
+      - name: Build Image with Packer
+        run: |
+          sudo apt-get update && sudo apt-get install -y genisoimage
+          cd sliver-training/windows-10
+          packer build packer.json
+      - name: Push Image to Registry
+        run: |
+          cd sliver-training/windows-10/OUTPUT
+          oras push --plain-http "registry:5000/images/windows-10.qc2:${{ github.ref_name }},${GITHUB_SHA:0:7}" windows-10.qc2
