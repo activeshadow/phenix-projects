@@ -100,6 +100,7 @@ spec:
     nodes:
     - general:
         hostname: grafana
+        do_not_boot: true
       hardware:
         drives:
         - image: grafana.qc2
@@ -126,6 +127,28 @@ spec:
           proto: static
           type: ethernet
           vlan: ot
+      type: VirtualMachine
+    - general:
+        hostname: adversary
+      hardware:
+        drives:
+        - image: wind-attacker.qc2
+        memory: 4096
+        os_type: linux
+        vcpus: 2
+      injections:
+      - src: /phenix/projects/wind-turbine/injects/aitm.py
+        dst: /root/aitm.py
+      - src: /phenix/projects/wind-turbine/injects/attack.sh
+        dst: /root/attack.sh
+      network:
+        interfaces:
+        - address: 1.1.1.250
+          mask: 24
+          name: IF0
+          proto: static
+          type: ethernet
+          vlan: turbine
       type: VirtualMachine
     - general:
         hostname: wtg-1-main-controller

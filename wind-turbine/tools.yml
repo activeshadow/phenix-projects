@@ -1,0 +1,173 @@
+apiVersion: phenix.sandia.gov/v1
+kind: Image
+metadata:
+  name: wind-attacker
+spec:
+  format: qcow2
+  mirror: http://ftp.us.debian.org/debian/
+  components:
+    - main
+    - restricted
+    - universe
+    - multiverse
+  packages:
+    - curl
+    - dbus
+    - ifupdown
+    - init
+    - initramfs-tools
+    - iproute2
+    - iputils-ping
+    - isc-dhcp-client
+    - less
+    - linux-headers-generic
+    - linux-image-generic
+    - net-tools
+    - netbase
+    - openssh-server
+    - tcpdump
+    - vim
+  release: trixie
+  script_order:
+    - POSTBUILD_NO_ROOT_PASSWD
+    - POSTBUILD_PHENIX_HOSTNAME
+    - POSTBUILD_PHENIX_BASE
+    - INSTALL_TOOLS
+    - POSTBUILD_APT_CLEANUP
+  scripts:
+    INSTALL_TOOLS: |
+      echo "wireshark-common wireshark-common/install-setuid boolean false" | debconf-set-selections
+      echo "keyboard-configuration keyboard-configuration/variant select 'English (US)'" | debconf-set-selections
+
+      apt update && apt install -y --no-install-recommends \
+        ca-certificates \
+        dsniff \
+        lightdm \
+        lxterminal \
+        htop \
+        iptables \
+        nano \
+        openbox \
+        python3 \
+        python3-pip \
+        python3-venv \
+        tint2 \
+        tmux \
+        tshark \
+        wireshark \
+        xdg-utils \
+        xorg \
+      && apt clean \
+      && apt autoremove -y
+
+      mkdir -p /usr/share/desktop-directories
+
+      python3 -m venv /opt/venv
+
+      cd /opt/venv && . bin/activate
+      pip install mitmproxy
+
+      cd ~
+      echo "PATH=/opt/venv/bin:\$PATH" >> ~/.bashrc
+
+      mkdir -p /root/.config/openbox
+      cat > /root/.config/openbox/menu.xml <<EOF
+      <?xml version="1.0" encoding="utf-8"?>
+      <openbox_menu xmlns="http://openbox.org/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://openbox.org/ file:///usr/share/openbox/menu.xsd">
+        <menu id="root-menu" label="Openbox 3">
+          <item label="Wireshark">
+            <action name="Execute">
+              <execute>/usr/bin/wireshark</execute>
+            </action>
+          </item>
+          <item label="Terminal">
+            <action name="Execute">
+              <execute>/usr/bin/x-terminal-emulator</execute>
+            </action>
+          </item>
+          <item label="Htop">
+            <action name="Execute">
+              <execute>/usr/bin/x-terminal-emulator -e htop</execute>
+            </action>
+          </item>
+        </menu>
+      </openbox_menu>
+      EOF
+
+      cp /etc/xdg/openbox/rc.xml /root/.config/openbox/rc.xml \
+        && sed -i 's/Clearlooks/Nightmare-01/g' /root/.config/openbox/rc.xml
+
+      cat > /root/.config/openbox/autostart <<EOF
+      tint2 &
+      wireshark &
+      EOF
+
+      mkdir -p /root/.config/tint2
+      cat > /root/.config/tint2/tint2rc <<EOF
+      panel_items = T
+      taskbar_name = 0
+      background_color = #7F1E31 100
+      EOF
+
+      cat > /etc/lightdm/lightdm.conf <<EOF
+      [Seat:*]
+      autologin-user=root
+      autologin-user-timeout=0
+      EOF
+
+      sed -i '/pam_succeed_if.so user != root/d' /etc/pam.d/lightdm-autologin
+
+      sysctl -w net.ipv4.ip_forward=1
+      sysctl -w net.ipv6.conf.all.forwarding=1
+      sysctl -w net.ipv4.conf.all.send_redirects=0
+    POSTBUILD_APT_CLEANUP: |
+      apt clean || apt-get clean || echo "unable to clean apt cache"
+    POSTBUILD_NO_ROOT_PASSWD: |
+      sed -i 's/nullok_secure/nullok/' /etc/pam.d/common-auth
+      sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+      sed -i 's/#PermitEmptyPasswords no/PermitEmptyPasswords yes/' /etc/ssh/sshd_config
+      sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+      sed -i 's/PermitEmptyPasswords no/PermitEmptyPasswords yes/' /etc/ssh/sshd_config
+      passwd -d root
+    POSTBUILD_PHENIX_BASE: |
+      cat > /etc/systemd/system/phenix.service <<EOF
+      [Unit]
+      Description=phenix startup service
+      After=network.target systemd-hostnamed.service
+      [Service]
+      Environment=LD_LIBRARY_PATH=/usr/local/lib
+      ExecStart=/usr/local/bin/phenix-start.sh
+      RemainAfterExit=true
+      StandardOutput=journal
+      Type=oneshot
+      [Install]
+      WantedBy=multi-user.target
+      EOF
+      mkdir -p /etc/systemd/system/multi-user.target.wants
+      ln -s /etc/systemd/system/phenix.service /etc/systemd/system/multi-user.target.wants/phenix.service
+      mkdir -p /usr/local/bin
+      cat > /usr/local/bin/phenix-start.sh <<EOF
+      #!/bin/bash
+      for file in /etc/phenix/startup/*; do
+        echo \$file
+        bash \$file
+      done
+      EOF
+      chmod +x /usr/local/bin/phenix-start.sh
+      mkdir -p /etc/phenix/startup
+    POSTBUILD_PHENIX_HOSTNAME: |
+      echo "phenix" > /etc/hostname
+      sed -i 's/127.0.1.1 .*/127.0.1.1 phenix/' /etc/hosts
+      cat > /etc/motd <<EOF
+
+      ██████╗ ██╗  ██╗███████╗███╗  ██╗██╗██╗  ██╗
+      ██╔══██╗██║  ██║██╔════╝████╗ ██║██║╚██╗██╔╝
+      ██████╔╝███████║█████╗  ██╔██╗██║██║ ╚███╔╝
+      ██╔═══╝ ██╔══██║██╔══╝  ██║╚████║██║ ██╔██╗
+      ██║     ██║  ██║███████╗██║ ╚███║██║██╔╝╚██╗
+      ╚═╝     ╚═╝  ╚═╝╚══════╝╚═╝  ╚══╝╚═╝╚═╝  ╚═╝
+
+      EOF
+      echo "\nBuilt with love using phenix image on $(date)\n\n" >> /etc/motd
+  size: 10G
+  variant: minbase
