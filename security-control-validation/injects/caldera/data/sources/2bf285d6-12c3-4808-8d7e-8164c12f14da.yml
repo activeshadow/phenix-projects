@@ -1,0 +1,15 @@
+---
+
+id: 2bf285d6-12c3-4808-8d7e-8164c12f14da
+name: OT DNP3 Demonstration
+facts:
+- trait: dnp3.server.ip
+  value: 10.0.40.100
+- trait: dnp3.server.port
+  value: 20000
+- trait: dnp3.local.link
+  value: 1
+- trait: dnp3.remote.link
+  value: 1024
+relationships: []
+rules: []

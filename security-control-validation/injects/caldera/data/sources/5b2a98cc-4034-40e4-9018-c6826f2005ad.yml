@@ -1,0 +1,19 @@
+---
+
+id: 5b2a98cc-4034-40e4-9018-c6826f2005ad
+name: OT Modbus Demonstration
+facts:
+- trait: modbus.server.ip
+  value: 10.0.40.100
+- trait: modbus.server.port
+  value: 502
+- trait: modbus.read.holding.start
+  value: 40000
+- trait: modbus.read.holding.count
+  value: 2
+- trait: modbus.write.holding.start
+  value: 40001
+- trait: modbus.write.holding.value
+  value: 0
+relationships: []
+rules: []

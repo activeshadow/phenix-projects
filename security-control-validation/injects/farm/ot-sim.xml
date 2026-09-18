@@ -1,0 +1,845 @@
+<ot-sim>
+  <message-bus>
+    <pull-endpoint>tcp://127.0.0.1:1234</pull-endpoint>
+    <pub-endpoint>tcp://127.0.0.1:5678</pub-endpoint>
+  </message-bus>
+  <cpu>
+    <api-endpoint>0.0.0.0:9101</api-endpoint>
+    <module name="backplane">ot-sim-message-bus {{config_file}}</module>
+    <module name="node-red">ot-sim-node-red-module {{config_file}}</module>
+    <module name="logic">ot-sim-logic-module {{config_file}}</module>
+    <module name="dnp3">ot-sim-dnp3-module {{config_file}}</module>
+    <module name="tailscale">ot-sim-tailscale-module {{config_file}}</module>
+  </cpu>
+  <tailscale>
+    <accept-dns>true</accept-dns>
+  </tailscale>
+  <logic name="wtg-total-farm.mw-output">
+    <period>5s</period>
+    <process-updates>true</process-updates>
+    <program>
+      <![CDATA[
+        power = [wtg1, wtg2, wtg3, wtg4, wtg5, wtg6, wtg7, wtg8, wtg9, wtg10]
+        total_gen = sum(power)
+
+        dir = [wind1, wind2, wind3, wind4, wind5, wind6, wind7, wind8, wind9, wind10]
+        filtered_dir = filter(dir, {# != 0})
+        wind_dir = len(filtered_dir) != 0 ? avg(filtered_dir) : 0
+
+        speed = [speed1, speed2, speed3, speed4, speed5, speed6, speed7, speed8, speed9, speed10]
+        filtered_speed = filter(speed, {# != 0})
+        wind_speed = len(filtered_speed) != 0 ? avg(filtered_speed) : 0
+
+        stopped = true
+        stopped = stopped && stopped1  == 1
+        stopped = stopped && stopped2  == 1
+        stopped = stopped && stopped3  == 1
+        stopped = stopped && stopped4  == 1
+        stopped = stopped && stopped5  == 1
+        stopped = stopped && stopped6  == 1
+        stopped = stopped && stopped7  == 1
+        stopped = stopped && stopped8  == 1
+        stopped = stopped && stopped9  == 1
+        stopped = stopped && stopped10 == 1
+
+        status1  = connected1  == 1 ? connected1  + stopped1  : connected1
+        status2  = connected2  == 1 ? connected2  + stopped2  : connected2
+        status3  = connected3  == 1 ? connected3  + stopped3  : connected3
+        status4  = connected4  == 1 ? connected4  + stopped4  : connected4
+        status5  = connected5  == 1 ? connected5  + stopped5  : connected5
+        status6  = connected6  == 1 ? connected6  + stopped6  : connected6
+        status7  = connected7  == 1 ? connected7  + stopped7  : connected7
+        status8  = connected8  == 1 ? connected8  + stopped8  : connected8
+        status9  = connected9  == 1 ? connected9  + stopped9  : connected9
+        status10 = connected10 == 1 ? connected10 + stopped10 : connected10
+      ]]>
+    </program>
+    <variables>
+      <total_gen tag="wtg-total-farm.mw-output">0</total_gen>
+      <wind_dir tag="wind-direction-avg">0</wind_dir>
+      <wind_speed tag="wind-speed-avg">0</wind_speed>
+      <stopped tag="wind-farm-stopped">0</stopped>
+      <status1 tag="wtg-1.status">0</status1>
+      <status2 tag="wtg-2.status">0</status2>
+      <status3 tag="wtg-3.status">0</status3>
+      <status4 tag="wtg-4.status">0</status4>
+      <status5 tag="wtg-5.status">0</status5>
+      <status6 tag="wtg-6.status">0</status6>
+      <status7 tag="wtg-7.status">0</status7>
+      <status8 tag="wtg-8.status">0</status8>
+      <status9 tag="wtg-9.status">0</status9>
+      <status10 tag="wtg-10.status">0</status10>
+      <connected1 tag="wtg-1-dnp3-master.connected">0</connected1>
+      <connected2 tag="wtg-2-dnp3-master.connected">0</connected2>
+      <connected3 tag="wtg-3-dnp3-master.connected">0</connected3>
+      <connected4 tag="wtg-4-dnp3-master.connected">0</connected4>
+      <connected5 tag="wtg-5-dnp3-master.connected">0</connected5>
+      <connected6 tag="wtg-6-dnp3-master.connected">0</connected6>
+      <connected7 tag="wtg-7-dnp3-master.connected">0</connected7>
+      <connected8 tag="wtg-8-dnp3-master.connected">0</connected8>
+      <connected9 tag="wtg-9-dnp3-master.connected">0</connected9>
+      <connected10 tag="wtg-10-dnp3-master.connected">0</connected10>
+      <wtg1 tag="wtg-1-turbine.mw-output">0</wtg1>
+      <wtg2 tag="wtg-2-turbine.mw-output">0</wtg2>
+      <wtg3 tag="wtg-3-turbine.mw-output">0</wtg3>
+      <wtg4 tag="wtg-4-turbine.mw-output">0</wtg4>
+      <wtg5 tag="wtg-5-turbine.mw-output">0</wtg5>
+      <wtg6 tag="wtg-6-turbine.mw-output">0</wtg6>
+      <wtg7 tag="wtg-7-turbine.mw-output">0</wtg7>
+      <wtg8 tag="wtg-8-turbine.mw-output">0</wtg8>
+      <wtg9 tag="wtg-9-turbine.mw-output">0</wtg9>
+      <wtg10 tag="wtg-10-turbine.mw-output">0</wtg10>
+      <wind1 tag="wtg-1-dir.high">0</wind1>
+      <wind2 tag="wtg-2-dir.high">0</wind2>
+      <wind3 tag="wtg-3-dir.high">0</wind3>
+      <wind4 tag="wtg-4-dir.high">0</wind4>
+      <wind5 tag="wtg-5-dir.high">0</wind5>
+      <wind6 tag="wtg-6-dir.high">0</wind6>
+      <wind7 tag="wtg-7-dir.high">0</wind7>
+      <wind8 tag="wtg-8-dir.high">0</wind8>
+      <wind9 tag="wtg-9-dir.high">0</wind9>
+      <wind10 tag="wtg-10-dir.high">0</wind10>
+      <speed1 tag="wtg-1-speed.high">0</speed1>
+      <speed2 tag="wtg-2-speed.high">0</speed2>
+      <speed3 tag="wtg-3-speed.high">0</speed3>
+      <speed4 tag="wtg-4-speed.high">0</speed4>
+      <speed5 tag="wtg-5-speed.high">0</speed5>
+      <speed6 tag="wtg-6-speed.high">0</speed6>
+      <speed7 tag="wtg-7-speed.high">0</speed7>
+      <speed8 tag="wtg-8-speed.high">0</speed8>
+      <speed9 tag="wtg-9-speed.high">0</speed9>
+      <speed10 tag="wtg-10-speed.high">0</speed10>
+      <stopped1 tag="wtg-1-turbine.emergency-stop">1</stopped1>
+      <stopped2 tag="wtg-2-turbine.emergency-stop">1</stopped2>
+      <stopped3 tag="wtg-3-turbine.emergency-stop">1</stopped3>
+      <stopped4 tag="wtg-4-turbine.emergency-stop">1</stopped4>
+      <stopped5 tag="wtg-5-turbine.emergency-stop">1</stopped5>
+      <stopped6 tag="wtg-6-turbine.emergency-stop">1</stopped6>
+      <stopped7 tag="wtg-7-turbine.emergency-stop">1</stopped7>
+      <stopped8 tag="wtg-8-turbine.emergency-stop">1</stopped8>
+      <stopped9 tag="wtg-9-turbine.emergency-stop">1</stopped9>
+      <stopped10 tag="wtg-10-turbine.emergency-stop">1</stopped10>
+    </variables>
+  </logic>
+  <node-red name="main-controller">
+    <executable>node-red</executable>
+    <theme>dark</theme>
+    <flow-path>/etc/node-red.json</flow-path>
+    <endpoint host="0.0.0.0" port="1880"/>
+    <authentication>
+      <editor username="admin" password="admin"/>
+      <ui username="foo" password="bar"/>
+    </authentication>
+  </node-red>
+  <!-- WTG 1 -->
+  <dnp3 name="wtg-1-dnp3-master" mode="client">
+    <endpoint>192.168.100.1:20000</endpoint>
+    <master name="dnp3-master">
+      <local-address>1</local-address>
+      <remote-address>1024</remote-address>
+      <scan-rate>5</scan-rate>
+      <output type="binary">
+        <address>0</address>
+        <tag>wtg-1-turbine.emergency-stop</tag>
+        <sbo>true</sbo>
+      </output>
+      <output type="analog">
+        <address>0</address>
+        <tag>wtg-1-yaw.dir-error</tag>
+        <sbo>true</sbo>
+      </output>
+      <input type="analog">
+        <address>0</address>
+        <tag>wtg-1-yaw.current</tag>
+      </input>
+      <input type="analog">
+        <address>1</address>
+        <tag>wtg-1-yaw.setpoint</tag>
+      </input>
+      <input type="analog">
+        <address>2</address>
+        <tag>wtg-1-turbine.mw-output</tag>
+      </input>
+      <input type="binary">
+        <address>0</address>
+        <tag>wtg-1-feathered</tag>
+      </input>
+      <input type="analog">
+        <address>3</address>
+        <tag>wtg-1-speed.high</tag>
+      </input>
+      <input type="analog">
+        <address>4</address>
+        <tag>wtg-1-speed.med</tag>
+      </input>
+      <input type="analog">
+        <address>5</address>
+        <tag>wtg-1-speed.low</tag>
+      </input>
+      <input type="analog">
+        <address>6</address>
+        <tag>wtg-1-dir.high</tag>
+      </input>
+      <input type="analog">
+        <address>7</address>
+        <tag>wtg-1-dir.med</tag>
+      </input>
+      <input type="analog">
+        <address>8</address>
+        <tag>wtg-1-dir.low</tag>
+      </input>
+      <input type="analog">
+        <address>9</address>
+        <tag>wtg-1-temp.high</tag>
+      </input>
+      <input type="analog">
+        <address>10</address>
+        <tag>wtg-1-temp.low</tag>
+      </input>
+      <input type="analog">
+        <address>11</address>
+        <tag>wtg-1-pressure</tag>
+      </input>
+    </master>
+  </dnp3>
+  <!-- WTG 2 -->
+  <dnp3 name="wtg-2-dnp3-master" mode="client">
+    <endpoint>wtg-2:20000</endpoint>
+    <master name="dnp3-master">
+      <local-address>1</local-address>
+      <remote-address>1024</remote-address>
+      <scan-rate>5</scan-rate>
+      <output type="binary">
+        <address>0</address>
+        <tag>wtg-2-turbine.emergency-stop</tag>
+        <sbo>true</sbo>
+      </output>
+      <output type="analog">
+        <address>0</address>
+        <tag>wtg-2-yaw.dir-error</tag>
+        <sbo>true</sbo>
+      </output>
+      <input type="analog">
+        <address>0</address>
+        <tag>wtg-2-yaw.current</tag>
+      </input>
+      <input type="analog">
+        <address>1</address>
+        <tag>wtg-2-yaw.setpoint</tag>
+      </input>
+      <input type="analog">
+        <address>2</address>
+        <tag>wtg-2-turbine.mw-output</tag>
+      </input>
+      <input type="binary">
+        <address>0</address>
+        <tag>wtg-2-feathered</tag>
+      </input>
+      <input type="analog">
+        <address>3</address>
+        <tag>wtg-2-speed.high</tag>
+      </input>
+      <input type="analog">
+        <address>4</address>
+        <tag>wtg-2-speed.med</tag>
+      </input>
+      <input type="analog">
+        <address>5</address>
+        <tag>wtg-2-speed.low</tag>
+      </input>
+      <input type="analog">
+        <address>6</address>
+        <tag>wtg-2-dir.high</tag>
+      </input>
+      <input type="analog">
+        <address>7</address>
+        <tag>wtg-2-dir.med</tag>
+      </input>
+      <input type="analog">
+        <address>8</address>
+        <tag>wtg-2-dir.low</tag>
+      </input>
+      <input type="analog">
+        <address>9</address>
+        <tag>wtg-2-temp.high</tag>
+      </input>
+      <input type="analog">
+        <address>10</address>
+        <tag>wtg-2-temp.low</tag>
+      </input>
+      <input type="analog">
+        <address>11</address>
+        <tag>wtg-2-pressure</tag>
+      </input>
+    </master>
+  </dnp3>
+  <!-- WTG 3 -->
+  <dnp3 name="wtg-3-dnp3-master" mode="client">
+    <endpoint>wtg-3:20000</endpoint>
+    <master name="dnp3-master">
+      <local-address>1</local-address>
+      <remote-address>1024</remote-address>
+      <scan-rate>5</scan-rate>
+      <output type="binary">
+        <address>0</address>
+        <tag>wtg-3-turbine.emergency-stop</tag>
+        <sbo>true</sbo>
+      </output>
+      <output type="analog">
+        <address>0</address>
+        <tag>wtg-3-yaw.dir-error</tag>
+        <sbo>true</sbo>
+      </output>
+      <input type="analog">
+        <address>0</address>
+        <tag>wtg-3-yaw.current</tag>
+      </input>
+      <input type="analog">
+        <address>1</address>
+        <tag>wtg-3-yaw.setpoint</tag>
+      </input>
+      <input type="analog">
+        <address>2</address>
+        <tag>wtg-3-turbine.mw-output</tag>
+      </input>
+      <input type="binary">
+        <address>0</address>
+        <tag>wtg-3-feathered</tag>
+      </input>
+      <input type="analog">
+        <address>3</address>
+        <tag>wtg-3-speed.high</tag>
+      </input>
+      <input type="analog">
+        <address>4</address>
+        <tag>wtg-3-speed.med</tag>
+      </input>
+      <input type="analog">
+        <address>5</address>
+        <tag>wtg-3-speed.low</tag>
+      </input>
+      <input type="analog">
+        <address>6</address>
+        <tag>wtg-3-dir.high</tag>
+      </input>
+      <input type="analog">
+        <address>7</address>
+        <tag>wtg-3-dir.med</tag>
+      </input>
+      <input type="analog">
+        <address>8</address>
+        <tag>wtg-3-dir.low</tag>
+      </input>
+      <input type="analog">
+        <address>9</address>
+        <tag>wtg-3-temp.high</tag>
+      </input>
+      <input type="analog">
+        <address>10</address>
+        <tag>wtg-3-temp.low</tag>
+      </input>
+      <input type="analog">
+        <address>11</address>
+        <tag>wtg-3-pressure</tag>
+      </input>
+    </master>
+  </dnp3>
+  <!-- WTG 4 -->
+  <dnp3 name="wtg-4-dnp3-master" mode="client">
+    <endpoint>wtg-4:20000</endpoint>
+    <master name="dnp3-master">
+      <local-address>1</local-address>
+      <remote-address>1024</remote-address>
+      <scan-rate>5</scan-rate>
+      <output type="binary">
+        <address>0</address>
+        <tag>wtg-4-turbine.emergency-stop</tag>
+        <sbo>true</sbo>
+      </output>
+      <output type="analog">
+        <address>0</address>
+        <tag>wtg-4-yaw.dir-error</tag>
+        <sbo>true</sbo>
+      </output>
+      <input type="analog">
+        <address>0</address>
+        <tag>wtg-4-yaw.current</tag>
+      </input>
+      <input type="analog">
+        <address>1</address>
+        <tag>wtg-4-yaw.setpoint</tag>
+      </input>
+      <input type="analog">
+        <address>2</address>
+        <tag>wtg-4-turbine.mw-output</tag>
+      </input>
+      <input type="binary">
+        <address>0</address>
+        <tag>wtg-4-feathered</tag>
+      </input>
+      <input type="analog">
+        <address>3</address>
+        <tag>wtg-4-speed.high</tag>
+      </input>
+      <input type="analog">
+        <address>4</address>
+        <tag>wtg-4-speed.med</tag>
+      </input>
+      <input type="analog">
+        <address>5</address>
+        <tag>wtg-4-speed.low</tag>
+      </input>
+      <input type="analog">
+        <address>6</address>
+        <tag>wtg-4-dir.high</tag>
+      </input>
+      <input type="analog">
+        <address>7</address>
+        <tag>wtg-4-dir.med</tag>
+      </input>
+      <input type="analog">
+        <address>8</address>
+        <tag>wtg-4-dir.low</tag>
+      </input>
+      <input type="analog">
+        <address>9</address>
+        <tag>wtg-4-temp.high</tag>
+      </input>
+      <input type="analog">
+        <address>10</address>
+        <tag>wtg-4-temp.low</tag>
+      </input>
+      <input type="analog">
+        <address>11</address>
+        <tag>wtg-4-pressure</tag>
+      </input>
+    </master>
+  </dnp3>
+  <!-- WTG 5 -->
+  <dnp3 name="wtg-5-dnp3-master" mode="client">
+    <endpoint>wtg-5:20000</endpoint>
+    <master name="dnp3-master">
+      <local-address>1</local-address>
+      <remote-address>1024</remote-address>
+      <scan-rate>5</scan-rate>
+      <output type="binary">
+        <address>0</address>
+        <tag>wtg-5-turbine.emergency-stop</tag>
+        <sbo>true</sbo>
+      </output>
+      <output type="analog">
+        <address>0</address>
+        <tag>wtg-5-yaw.dir-error</tag>
+        <sbo>true</sbo>
+      </output>
+      <input type="analog">
+        <address>0</address>
+        <tag>wtg-5-yaw.current</tag>
+      </input>
+      <input type="analog">
+        <address>1</address>
+        <tag>wtg-5-yaw.setpoint</tag>
+      </input>
+      <input type="analog">
+        <address>2</address>
+        <tag>wtg-5-turbine.mw-output</tag>
+      </input>
+      <input type="binary">
+        <address>0</address>
+        <tag>wtg-5-feathered</tag>
+      </input>
+      <input type="analog">
+        <address>3</address>
+        <tag>wtg-5-speed.high</tag>
+      </input>
+      <input type="analog">
+        <address>4</address>
+        <tag>wtg-5-speed.med</tag>
+      </input>
+      <input type="analog">
+        <address>5</address>
+        <tag>wtg-5-speed.low</tag>
+      </input>
+      <input type="analog">
+        <address>6</address>
+        <tag>wtg-5-dir.high</tag>
+      </input>
+      <input type="analog">
+        <address>7</address>
+        <tag>wtg-5-dir.med</tag>
+      </input>
+      <input type="analog">
+        <address>8</address>
+        <tag>wtg-5-dir.low</tag>
+      </input>
+      <input type="analog">
+        <address>9</address>
+        <tag>wtg-5-temp.high</tag>
+      </input>
+      <input type="analog">
+        <address>10</address>
+        <tag>wtg-5-temp.low</tag>
+      </input>
+      <input type="analog">
+        <address>11</address>
+        <tag>wtg-5-pressure</tag>
+      </input>
+    </master>
+  </dnp3>
+  <!-- WTG 6 -->
+  <dnp3 name="wtg-6-dnp3-master" mode="client">
+    <endpoint>wtg-6:20000</endpoint>
+    <master name="dnp3-master">
+      <local-address>1</local-address>
+      <remote-address>1024</remote-address>
+      <scan-rate>5</scan-rate>
+      <output type="binary">
+        <address>0</address>
+        <tag>wtg-6-turbine.emergency-stop</tag>
+        <sbo>true</sbo>
+      </output>
+      <output type="analog">
+        <address>0</address>
+        <tag>wtg-6-yaw.dir-error</tag>
+        <sbo>true</sbo>
+      </output>
+      <input type="analog">
+        <address>0</address>
+        <tag>wtg-6-yaw.current</tag>
+      </input>
+      <input type="analog">
+        <address>1</address>
+        <tag>wtg-6-yaw.setpoint</tag>
+      </input>
+      <input type="analog">
+        <address>2</address>
+        <tag>wtg-6-turbine.mw-output</tag>
+      </input>
+      <input type="binary">
+        <address>0</address>
+        <tag>wtg-6-feathered</tag>
+      </input>
+      <input type="analog">
+        <address>3</address>
+        <tag>wtg-6-speed.high</tag>
+      </input>
+      <input type="analog">
+        <address>4</address>
+        <tag>wtg-6-speed.med</tag>
+      </input>
+      <input type="analog">
+        <address>5</address>
+        <tag>wtg-6-speed.low</tag>
+      </input>
+      <input type="analog">
+        <address>6</address>
+        <tag>wtg-6-dir.high</tag>
+      </input>
+      <input type="analog">
+        <address>7</address>
+        <tag>wtg-6-dir.med</tag>
+      </input>
+      <input type="analog">
+        <address>8</address>
+        <tag>wtg-6-dir.low</tag>
+      </input>
+      <input type="analog">
+        <address>9</address>
+        <tag>wtg-6-temp.high</tag>
+      </input>
+      <input type="analog">
+        <address>10</address>
+        <tag>wtg-6-temp.low</tag>
+      </input>
+      <input type="analog">
+        <address>11</address>
+        <tag>wtg-6-pressure</tag>
+      </input>
+    </master>
+  </dnp3>
+  <!-- WTG 7 -->
+  <dnp3 name="wtg-7-dnp3-master" mode="client">
+    <endpoint>wtg-7:20000</endpoint>
+    <master name="dnp3-master">
+      <local-address>1</local-address>
+      <remote-address>1024</remote-address>
+      <scan-rate>5</scan-rate>
+      <output type="binary">
+        <address>0</address>
+        <tag>wtg-7-turbine.emergency-stop</tag>
+        <sbo>true</sbo>
+      </output>
+      <output type="analog">
+        <address>0</address>
+        <tag>wtg-7-yaw.dir-error</tag>
+        <sbo>true</sbo>
+      </output>
+      <input type="analog">
+        <address>0</address>
+        <tag>wtg-7-yaw.current</tag>
+      </input>
+      <input type="analog">
+        <address>1</address>
+        <tag>wtg-7-yaw.setpoint</tag>
+      </input>
+      <input type="analog">
+        <address>2</address>
+        <tag>wtg-7-turbine.mw-output</tag>
+      </input>
+      <input type="binary">
+        <address>0</address>
+        <tag>wtg-7-feathered</tag>
+      </input>
+      <input type="analog">
+        <address>3</address>
+        <tag>wtg-7-speed.high</tag>
+      </input>
+      <input type="analog">
+        <address>4</address>
+        <tag>wtg-7-speed.med</tag>
+      </input>
+      <input type="analog">
+        <address>5</address>
+        <tag>wtg-7-speed.low</tag>
+      </input>
+      <input type="analog">
+        <address>6</address>
+        <tag>wtg-7-dir.high</tag>
+      </input>
+      <input type="analog">
+        <address>7</address>
+        <tag>wtg-7-dir.med</tag>
+      </input>
+      <input type="analog">
+        <address>8</address>
+        <tag>wtg-7-dir.low</tag>
+      </input>
+      <input type="analog">
+        <address>9</address>
+        <tag>wtg-7-temp.high</tag>
+      </input>
+      <input type="analog">
+        <address>10</address>
+        <tag>wtg-7-temp.low</tag>
+      </input>
+      <input type="analog">
+        <address>11</address>
+        <tag>wtg-7-pressure</tag>
+      </input>
+    </master>
+  </dnp3>
+  <!-- WTG 8 -->
+  <dnp3 name="wtg-8-dnp3-master" mode="client">
+    <endpoint>wtg-8:20000</endpoint>
+    <master name="dnp3-master">
+      <local-address>1</local-address>
+      <remote-address>1024</remote-address>
+      <scan-rate>5</scan-rate>
+      <output type="binary">
+        <address>0</address>
+        <tag>wtg-8-turbine.emergency-stop</tag>
+        <sbo>true</sbo>
+      </output>
+      <output type="analog">
+        <address>0</address>
+        <tag>wtg-8-yaw.dir-error</tag>
+        <sbo>true</sbo>
+      </output>
+      <input type="analog">
+        <address>0</address>
+        <tag>wtg-8-yaw.current</tag>
+      </input>
+      <input type="analog">
+        <address>1</address>
+        <tag>wtg-8-yaw.setpoint</tag>
+      </input>
+      <input type="analog">
+        <address>2</address>
+        <tag>wtg-8-turbine.mw-output</tag>
+      </input>
+      <input type="binary">
+        <address>0</address>
+        <tag>wtg-8-feathered</tag>
+      </input>
+      <input type="analog">
+        <address>3</address>
+        <tag>wtg-8-speed.high</tag>
+      </input>
+      <input type="analog">
+        <address>4</address>
+        <tag>wtg-8-speed.med</tag>
+      </input>
+      <input type="analog">
+        <address>5</address>
+        <tag>wtg-8-speed.low</tag>
+      </input>
+      <input type="analog">
+        <address>6</address>
+        <tag>wtg-8-dir.high</tag>
+      </input>
+      <input type="analog">
+        <address>7</address>
+        <tag>wtg-8-dir.med</tag>
+      </input>
+      <input type="analog">
+        <address>8</address>
+        <tag>wtg-8-dir.low</tag>
+      </input>
+      <input type="analog">
+        <address>9</address>
+        <tag>wtg-8-temp.high</tag>
+      </input>
+      <input type="analog">
+        <address>10</address>
+        <tag>wtg-8-temp.low</tag>
+      </input>
+      <input type="analog">
+        <address>11</address>
+        <tag>wtg-8-pressure</tag>
+      </input>
+    </master>
+  </dnp3>
+  <!-- WTG 9 -->
+  <dnp3 name="wtg-9-dnp3-master" mode="client">
+    <endpoint>wtg-9:20000</endpoint>
+    <master name="dnp3-master">
+      <local-address>1</local-address>
+      <remote-address>1024</remote-address>
+      <scan-rate>5</scan-rate>
+      <output type="binary">
+        <address>0</address>
+        <tag>wtg-9-turbine.emergency-stop</tag>
+        <sbo>true</sbo>
+      </output>
+      <output type="analog">
+        <address>0</address>
+        <tag>wtg-9-yaw.dir-error</tag>
+        <sbo>true</sbo>
+      </output>
+      <input type="analog">
+        <address>0</address>
+        <tag>wtg-9-yaw.current</tag>
+      </input>
+      <input type="analog">
+        <address>1</address>
+        <tag>wtg-9-yaw.setpoint</tag>
+      </input>
+      <input type="analog">
+        <address>2</address>
+        <tag>wtg-9-turbine.mw-output</tag>
+      </input>
+      <input type="binary">
+        <address>0</address>
+        <tag>wtg-9-feathered</tag>
+      </input>
+      <input type="analog">
+        <address>3</address>
+        <tag>wtg-9-speed.high</tag>
+      </input>
+      <input type="analog">
+        <address>4</address>
+        <tag>wtg-9-speed.med</tag>
+      </input>
+      <input type="analog">
+        <address>5</address>
+        <tag>wtg-9-speed.low</tag>
+      </input>
+      <input type="analog">
+        <address>6</address>
+        <tag>wtg-9-dir.high</tag>
+      </input>
+      <input type="analog">
+        <address>7</address>
+        <tag>wtg-9-dir.med</tag>
+      </input>
+      <input type="analog">
+        <address>8</address>
+        <tag>wtg-9-dir.low</tag>
+      </input>
+      <input type="analog">
+        <address>9</address>
+        <tag>wtg-9-temp.high</tag>
+      </input>
+      <input type="analog">
+        <address>10</address>
+        <tag>wtg-9-temp.low</tag>
+      </input>
+      <input type="analog">
+        <address>11</address>
+        <tag>wtg-9-pressure</tag>
+      </input>
+    </master>
+  </dnp3>
+  <!-- WTG 10 -->
+  <dnp3 name="wtg-10-dnp3-master" mode="client">
+    <endpoint>wtg-10:20000</endpoint>
+    <master name="dnp3-master">
+      <local-address>1</local-address>
+      <remote-address>1024</remote-address>
+      <scan-rate>5</scan-rate>
+      <output type="binary">
+        <address>0</address>
+        <tag>wtg-10-turbine.emergency-stop</tag>
+        <sbo>true</sbo>
+      </output>
+      <output type="analog">
+        <address>0</address>
+        <tag>wtg-10-yaw.dir-error</tag>
+        <sbo>true</sbo>
+      </output>
+      <input type="analog">
+        <address>0</address>
+        <tag>wtg-10-yaw.current</tag>
+      </input>
+      <input type="analog">
+        <address>1</address>
+        <tag>wtg-10-yaw.setpoint</tag>
+      </input>
+      <input type="analog">
+        <address>2</address>
+        <tag>wtg-10-turbine.mw-output</tag>
+      </input>
+      <input type="binary">
+        <address>0</address>
+        <tag>wtg-10-feathered</tag>
+      </input>
+      <input type="analog">
+        <address>3</address>
+        <tag>wtg-10-speed.high</tag>
+      </input>
+      <input type="analog">
+        <address>4</address>
+        <tag>wtg-10-speed.med</tag>
+      </input>
+      <input type="analog">
+        <address>5</address>
+        <tag>wtg-10-speed.low</tag>
+      </input>
+      <input type="analog">
+        <address>6</address>
+        <tag>wtg-10-dir.high</tag>
+      </input>
+      <input type="analog">
+        <address>7</address>
+        <tag>wtg-10-dir.med</tag>
+      </input>
+      <input type="analog">
+        <address>8</address>
+        <tag>wtg-10-dir.low</tag>
+      </input>
+      <input type="analog">
+        <address>9</address>
+        <tag>wtg-10-temp.high</tag>
+      </input>
+      <input type="analog">
+        <address>10</address>
+        <tag>wtg-10-temp.low</tag>
+      </input>
+      <input type="analog">
+        <address>11</address>
+        <tag>wtg-10-pressure</tag>
+      </input>
+    </master>
+  </dnp3>
+</ot-sim>
+

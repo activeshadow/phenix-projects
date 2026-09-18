@@ -1,0 +1,405 @@
+apiVersion: phenix.sandia.gov/v1
+kind: Experiment
+metadata:
+  name: scv-demo
+spec:
+  scenario:
+    apps:
+    - name: caldera
+      hosts:
+      - hostname: corp-ws
+        metadata:
+          server: caldera:0
+          system: false
+#     - hostname: farm-hmi
+#       metadata:
+#         server: caldera:0
+#         system: true
+    - name: wind-turbine
+      disabled: true
+      metadata:
+        templates:
+          default:
+            main-controller:
+              turbine:
+                type: E-126/4200
+                hubHeight: 135
+                roughnessLength: 0.15
+              logic:
+                speedTag: speed.high
+                directionTag: dir.high
+                directionError: 0.04
+              node-red:
+                flow: /phenix/projects/security-control-validation/injects/turbine/node-red.json
+                endpoint:
+                  host: 0.0.0.0
+                  port: 1880
+                auth:
+                  editor:
+                    user: admin
+                    pass: admin
+              weather:
+                columns:
+                - name: wind_speed
+                  tags:
+                  - name: speed.high
+                    height: 58.2
+                  - name: speed.med
+                    height: 36.6
+                  - name: speed.low
+                    height: 15.0
+                - name: temperature
+                  tags:
+                  - name: temp.high
+                    height: 58.2
+                  - name: temp.low
+                    height: 3.0
+                - name: pressure
+                  tags:
+                  - name: pressure
+                    height: 0.0
+            anemometer:
+              weather:
+                replayData: /phenix/projects/security-control-validation/injects/turbine/weather.csv
+                columns:
+                - name: Windspeed 58.2m
+                  tag: speed.high
+                - name: Windspeed 36.6m
+                  tag: speed.med
+                - name: Windspeed 15.0m
+                  tag: speed.low
+                - name: Wind Direction 58.2m
+                  tag: dir.high
+                - name: Wind Direction 36.6m
+                  tag: dir.med
+                - name: Wind Direction 15.0m
+                  tag: dir.low
+                - name: Temperature 58.2m
+                  tag: temp.high
+                - name: Temperature 3.0m
+                  tag: temp.low
+                - name: Barometric Pressure
+                  tag: pressure
+            yaw-controller:
+              yaw:
+                initialPosition: 0
+                degreePerSecond: 0.1
+      hosts:
+      - hostname: turbine-main
+        metadata:
+          type: main-controller
+          template: default
+          outstation:
+            dnp3: true
+            modbus: true
+          controllers:
+            anemometer: turbine-anemometer
+            yaw: turbine-yaw
+            blades:
+            - turbine-blade-1
+            - turbine-blade-2
+            - turbine-blade-3
+      - hostname: turbine-anemometer
+        metadata:
+          type: anemometer
+          template: default
+      - hostname: turbine-yaw
+        metadata:
+          type: yaw-controller
+          template: default
+  topology:
+    nodes:
+    - general:
+        hostname: caldera
+      annotations:
+        phenix/startup-autotunnel:
+        - 5901:localhost:vnc
+        - 8888:localhost:8888
+      hardware:
+        drives:
+        - image: caldera.qc2
+        os_type: linux
+        memory: 2048
+        vcpus: 2
+      injections:
+      - src: /phenix/projects/security-control-validation/injects/caldera
+        dst: /opt
+      - src: /phenix/projects/security-control-validation/injects/firefox-autostart.desktop
+        dst: /root/.config/autostart/Caldera.desktop
+      - src: /phenix/projects/security-control-validation/injects/firefox-bookmark.json
+        dst: /etc/firefox/policies/policies.json
+      - src: /phenix/projects/security-control-validation/injects/bustleberm.exe
+        dst: /opt/caldera/plugins/ot/payloads/bustleberm.exe
+      network:
+        interfaces:
+        - address: 1.2.3.4
+          mask: 24
+          gateway: 1.2.3.254
+          name: IF0
+          proto: static
+          type: ethernet
+          vlan: corp
+      type: VirtualMachine
+    - general:
+        hostname: corp-ws
+      annotations:
+        includes-phenix-startup: true
+        phenix/windows-rearm: true
+      hardware:
+        drives:
+        - image: win-10.qc2
+        os_type: windows
+        memory: 2048
+        vcpus: 2
+      injections:
+      - src: /phenix/projects/security-control-validation/injects/Disable-WindowsFirewall.ps1
+        dst: /phenix/startup/50-disable-firewall.ps1
+#     - src: /phenix/projects/security-control-validation/injects/goart.exe
+#       dst: /Users/Public/goart.exe
+      network:
+        interfaces:
+        - address: 1.2.3.5
+          mask: 24
+          gateway: 1.2.3.254
+          name: IF0
+          proto: static
+          type: ethernet
+          vlan: corp
+      type: VirtualMachine
+    - general:
+        hostname: farm-rtr
+      hardware:
+        drives:
+        - image: minirouter.qc2
+        os_type: minirouter
+        memory: 256
+        vcpus: 1
+      network:
+        interfaces:
+        - address: 1.2.3.254
+          mask: 24
+          name: IF0
+          proto: static
+          type: ethernet
+          vlan: corp
+        - address: 10.0.40.1
+          mask: 24
+          name: IF0
+          proto: static
+          type: ethernet
+          vlan: farm
+      commands:
+        - exec sysctl -w net.ipv4.ip_forward=1
+      type: Router
+    - general:
+        hostname: farm-ctlr
+      annotations:
+        phenix/startup-autotunnel:
+        - 1880:localhost:1880
+      hardware:
+        drives:
+        - image: ot-sim.qc2
+        os_type: linux
+        memory: 512
+        vcpus: 1
+      injections:
+      - src: /phenix/projects/security-control-validation/injects/farm/ot-sim.xml
+        dst: /etc/ot-sim/config.xml
+      - src: /phenix/projects/security-control-validation/injects/farm/node-red.json
+        dst: /etc/node-red.json
+      network:
+        interfaces:
+        - address: 10.0.40.100
+          mask: 24
+          gateway: 10.0.40.254
+          name: IF0
+          proto: static
+          type: ethernet
+          vlan: farm
+      type: VirtualMachine
+    - general:
+        hostname: farm-hmi
+      annotations:
+        includes-phenix-startup: true
+        phenix/windows-rearm: true
+      hardware:
+        drives:
+        - image: win-10.qc2
+        os_type: windows
+        memory: 2048
+        vcpus: 2
+      injections:
+      - src: /phenix/projects/security-control-validation/injects/Disable-WindowsFirewall.ps1
+        dst: /phenix/startup/50-disable-firewall.ps1
+      network:
+        interfaces:
+        - address: 10.0.40.200
+          mask: 24
+          gateway: 10.0.40.254
+          name: IF0
+          proto: static
+          type: ethernet
+          vlan: farm
+      type: VirtualMachine
+    - general:
+        hostname: tan-rtr
+      hardware:
+        drives:
+        - image: minirouter.qc2
+        os_type: minirouter
+        memory: 256
+        vcpus: 1
+      network:
+        interfaces:
+        - address: 10.0.40.254
+          mask: 24
+          name: IF0
+          proto: static
+          type: ethernet
+          vlan: farm
+        - address: 192.168.100.254
+          mask: 24
+          name: IF0
+          proto: static
+          type: ethernet
+          vlan: tan
+        routes:
+        - destination: 1.2.3.0/24
+          next: 10.0.40.1
+      commands:
+        - exec sysctl -w net.ipv4.ip_forward=1
+      type: Router
+    - general:
+        hostname: turbine-main
+      hardware:
+        drives:
+        - image: ot-sim.qc2
+        os_type: linux
+        memory: 512
+        vcpus: 1
+      injections:
+      - src: /phenix/projects/security-control-validation/injects/turbine/main.xml
+        dst: /etc/ot-sim/config.xml
+      network:
+        interfaces:
+        - address: 192.168.100.1
+          gateway: 192.168.100.254
+          mask: 24
+          name: IF0
+          proto: static
+          type: ethernet
+          vlan: tan
+        - address: 1.1.1.254
+          mask: 24
+          name: IF1
+          proto: static
+          type: ethernet
+          vlan: turbine
+      type: VirtualMachine
+    - general:
+        hostname: turbine-yaw
+      hardware:
+        drives:
+        - image: ot-sim.qc2
+        os_type: linux
+        memory: 256
+        vcpus: 1
+      injections:
+      - src: /phenix/projects/security-control-validation/injects/turbine/yaw.xml
+        dst: /etc/ot-sim/config.xml
+      network:
+        interfaces:
+        - address: 1.1.1.11
+          gateway: 1.1.1.254
+          mask: 24
+          name: IF0
+          proto: static
+          type: ethernet
+          vlan: turbine
+      type: VirtualMachine
+    - general:
+        hostname: turbine-anemometer
+      hardware:
+        drives:
+        - image: ot-sim.qc2
+        os_type: linux
+        memory: 256
+        vcpus: 1
+      injections:
+      - src: /phenix/projects/security-control-validation/injects/turbine/anemometer.xml
+        dst: /etc/ot-sim/config.xml
+      - src: /phenix/projects/security-control-validation/injects/turbine/weather.csv
+        dst: /etc/ot-sim/data/weather.csv
+      network:
+        interfaces:
+        - address: 1.1.1.21
+          gateway: 1.1.1.254
+          mask: 24
+          name: IF0
+          proto: static
+          type: ethernet
+          vlan: turbine
+      type: VirtualMachine
+    - general:
+        hostname: turbine-blade-1
+      hardware:
+        drives:
+        - image: ot-sim.qc2
+        os_type: linux
+        memory: 256
+        vcpus: 1
+      injections:
+      - src: /phenix/projects/security-control-validation/injects/turbine/blade-1.xml
+        dst: /etc/ot-sim/config.xml
+      network:
+        interfaces:
+        - address: 1.1.1.31
+          gateway: 1.1.1.254
+          mask: 24
+          name: IF0
+          proto: static
+          type: ethernet
+          vlan: turbine
+      type: VirtualMachine
+    - general:
+        hostname: turbine-blade-2
+      hardware:
+        drives:
+        - image: ot-sim.qc2
+        os_type: linux
+        memory: 256
+        vcpus: 1
+      injections:
+      - src: /phenix/projects/security-control-validation/injects/turbine/blade-2.xml
+        dst: /etc/ot-sim/config.xml
+      network:
+        interfaces:
+        - address: 1.1.1.32
+          gateway: 1.1.1.254
+          mask: 24
+          name: IF0
+          proto: static
+          type: ethernet
+          vlan: turbine
+      type: VirtualMachine
+    - general:
+        hostname: turbine-blade-3
+      hardware:
+        drives:
+        - image: ot-sim.qc2
+        os_type: linux
+        memory: 256
+        vcpus: 1
+      injections:
+      - src: /phenix/projects/security-control-validation/injects/turbine/blade-3.xml
+        dst: /etc/ot-sim/config.xml
+      network:
+        interfaces:
+        - address: 1.1.1.33
+          gateway: 1.1.1.254
+          mask: 24
+          name: IF0
+          proto: static
+          type: ethernet
+          vlan: turbine
+      type: VirtualMachine
