@@ -1,7 +1,7 @@
 apiVersion: phenix.sandia.gov/v1
 kind: Image
 metadata:
-  name: wind-attacker
+  name: wind-turbine-adversary
 spec:
   format: qcow2
   mirror: http://ftp.us.debian.org/debian/
@@ -99,7 +99,6 @@ spec:
 
       cat > /root/.config/openbox/autostart <<EOF
       tint2 &
-      wireshark &
       EOF
 
       mkdir -p /root/.config/tint2
