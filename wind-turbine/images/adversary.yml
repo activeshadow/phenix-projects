@@ -28,6 +28,8 @@ spec:
     - tcpdump
     - vim
   release: trixie
+  overlays:
+    - /phenix/projects/wind-turbine/images/overlays/adversary
   script_order:
     - POSTBUILD_NO_ROOT_PASSWD
     - POSTBUILD_PHENIX_HOSTNAME
@@ -42,6 +44,7 @@ spec:
       apt update && apt install -y --no-install-recommends \
         ca-certificates \
         dsniff \
+        feh \
         lightdm \
         lxterminal \
         htop \
@@ -97,8 +100,13 @@ spec:
       cp /etc/xdg/openbox/rc.xml /root/.config/openbox/rc.xml \
         && sed -i 's/Clearlooks/Nightmare-01/g' /root/.config/openbox/rc.xml
 
+      mkdir -p /usr/share/wallpaper
+      cp /usr/local/src/login-instructions.png /usr/share/wallpaper
+      cp /usr/local/src/app-instructions.png   /usr/share/wallpaper
+
       cat > /root/.config/openbox/autostart <<EOF
       tint2 &
+      feh --bg-center /usr/share/wallpaper/app-instructions.png
       EOF
 
       mkdir -p /root/.config/tint2
@@ -112,6 +120,11 @@ spec:
       [Seat:*]
       autologin-user=root
       autologin-user-timeout=0
+      EOF
+
+      cat > /etc/lightdm/lightdm-gtk-greeter.conf <<EOF
+      [greeter]
+      background=/usr/share/wallpaper/login-instructions.png
       EOF
 
       sed -i '/pam_succeed_if.so user != root/d' /etc/pam.d/lightdm-autologin

@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       grafana: ${{ steps.filter.outputs.grafana }}
+      adversary: ${{ steps.filter.outputs.adversary }}
       kali: ${{ steps.filter.outputs.kali }}
       sliver: ${{ steps.filter.outputs.sliver }}
     steps:
@@ -16,7 +17,9 @@ jobs:
         with:
           filters: |
             grafana:
-              - 'wind-turbine/grafana.yml'
+              - 'wind-turbine/images/grafana.yml'
+            adversary:
+              - 'wind-turbine/images/adversary.yml'
             kali:
               - 'mad-emu-lab/kali/mad-emu-kali.yml'
             sliver:
@@ -53,7 +56,7 @@ jobs:
           docker run --rm \
             -v ${{ github.workspace }}:/workspace \
             ghcr.io/activeshadow/sceptre-phenix/phenix:main \
-            phenix --store.endpoint=bolt:///workspace/store.bdb config create /workspace/wind-turbine/grafana.yml
+            phenix --store.endpoint=bolt:///workspace/store.bdb config create /workspace/wind-turbine/images/grafana.yml
           docker run --rm --privileged \
             -v ${{ github.workspace }}:/workspace -v /dev:/dev \
             ghcr.io/activeshadow/sceptre-phenix/phenix:main \
@@ -62,6 +65,29 @@ jobs:
         run: |
           oras login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} ghcr.io
           oras push "ghcr.io/${{ github.repository }}/grafana.qc2:${{ github.ref_name }},${GITHUB_SHA:0:7}" grafana.qc2
+  build-adversary:
+    name: Build Wind Turbine Adversary VM Image
+    runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.adversary == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-docker-action@v4
+      - uses: oras-project/setup-oras@v1
+      - name: Wind Turbine Adversary Image Build
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            ghcr.io/activeshadow/sceptre-phenix/phenix:main \
+            phenix --store.endpoint=bolt:///workspace/store.bdb config create /workspace/wind-turbine/images/adversary.yml
+          docker run --rm --privileged \
+            -v ${{ github.workspace }}:/workspace -v /dev:/dev \
+            ghcr.io/activeshadow/sceptre-phenix/phenix:main \
+            phenix --store.endpoint=bolt:///workspace/store.bdb image build -x -c -o /workspace wind-turbine-adversary
+      - name: Push Image to Registry
+        run: |
+          oras login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} ghcr.io
+          oras push "ghcr.io/${{ github.repository }}/wind-turbine-adversary.qc2:${{ github.ref_name }},${GITHUB_SHA:0:7}" wind-turbine-adversary.qc2
   build-mad-emu-kali:
     name: Build MAD Emulation Lab Kali VM Image
     runs-on: ubuntu-latest

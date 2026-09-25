@@ -100,7 +100,6 @@ spec:
     nodes:
     - general:
         hostname: grafana
-        do_not_boot: true
       hardware:
         drives:
         - image: grafana.qc2
@@ -132,7 +131,7 @@ spec:
         hostname: adversary
       hardware:
         drives:
-        - image: wind-attacker.qc2
+        - image: wind-turbine-adversary.qc2
         memory: 4096
         os_type: linux
         vcpus: 2
@@ -152,13 +151,16 @@ spec:
       type: VirtualMachine
     - general:
         hostname: wtg-1-main-controller
-      annotations:
-        phenix/startup-autotunnel:
-        - 1880:localhost:1880
+#     annotations:
+#       phenix/startup-autotunnel:
+#       - 1880:localhost:1880
       hardware:
         drives:
         - image: ot-sim.qc2
         os_type: linux
+      injections:
+      - src: /phenix/projects/wind-turbine/injects/turbine-html
+        dst: /var/www/html
       network:
         interfaces:
         - address: 192.168.100.1
