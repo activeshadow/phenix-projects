@@ -30,10 +30,10 @@ and a new phēnix user app
 
 The following steps are required to use this project:
 
-1. Download the Grafana OT-sim VMs using Oras
+1. Download the Grafana, Adversary, and OT-sim VMs using Oras
 1. Deploy the project experiment using phenix
 
-### Download the Grafana and OT-sim VMs Using Oras
+### Download the Grafana, Adversary, and OT-sim VMs Using Oras
 
 The [Oras](https://oras.land) CLI can be used to download pre-built images of
 Grafana and OT-sim for use in this experiment.
@@ -41,6 +41,7 @@ Grafana and OT-sim for use in this experiment.
 ```
 cd /phenix/images
 oras pull ghcr.io/activeshadow/phenix-projects/grafana.qc2:main
+oras pull ghcr.io/activeshadow/phenix-projects/wind-turbine-adversary.qc2:main
 oras pull ghcr.io/patsec/ot-sim/ot-sim.qc2:main
 ```
 
@@ -50,10 +51,11 @@ latest version of `miniccc` is installed in the VM images downloaded above.
 
 ```
 ph image inject-miniexe /opt/minimega/bin/miniccc /phenix/images/grafana.qc2
+ph image inject-miniexe /opt/minimega/bin/miniccc /phenix/images/wind-turbine-adversary.qc2
 ph image inject-miniexe /opt/minimega/bin/miniccc /phenix/images/ot-sim.qc2
 ```
 
-### Deploy the Lab Environment Using phenix
+### Deploy the Project Experiment Using phenix
 
 The root directory of this repo contains a phenix experiment config for
 deploying the lab environment. To deploy, run the following commands.

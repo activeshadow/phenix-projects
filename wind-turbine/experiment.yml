@@ -9,7 +9,7 @@ spec:
       metadata:
         ground-truth-module:
           elastic:
-            endpoint: http://192.168.100.250:9200
+            endpoint: http://1.1.1.250:9200
             index-base-name: wind-turbine
         templates:
           default:
@@ -100,6 +100,9 @@ spec:
     nodes:
     - general:
         hostname: grafana
+      annotations:
+        phenix/startup-autotunnel:
+        - 30000:localhost:3000
       hardware:
         drives:
         - image: grafana.qc2
@@ -119,13 +122,12 @@ spec:
         dst: /var/lib/grafana/dashboards/turbine-dashboard.json
       network:
         interfaces:
-        - address: 192.168.100.250
-          gateway: 192.168.100.254
+        - address: 1.1.1.250
           mask: 24
           name: IF0
           proto: static
           type: ethernet
-          vlan: ot
+          vlan: turbine
       type: VirtualMachine
     - general:
         hostname: adversary
@@ -142,7 +144,7 @@ spec:
         dst: /root/attack.sh
       network:
         interfaces:
-        - address: 1.1.1.250
+        - address: 1.1.1.200
           mask: 24
           name: IF0
           proto: static
@@ -151,9 +153,10 @@ spec:
       type: VirtualMachine
     - general:
         hostname: wtg-1-main-controller
-#     annotations:
-#       phenix/startup-autotunnel:
-#       - 1880:localhost:1880
+      annotations:
+        phenix/startup-autotunnel:
+        - 1880:localhost:1880
+        - 9101:localhost:9101
       hardware:
         drives:
         - image: ot-sim.qc2
@@ -186,7 +189,6 @@ spec:
       network:
         interfaces:
         - address: 1.1.1.11
-          gateway: 1.1.1.254
           mask: 24
           name: IF0
           proto: static
@@ -202,7 +204,6 @@ spec:
       network:
         interfaces:
         - address: 1.1.1.21
-          gateway: 1.1.1.254
           mask: 24
           name: IF0
           proto: static
@@ -218,7 +219,6 @@ spec:
       network:
         interfaces:
         - address: 1.1.1.31
-          gateway: 1.1.1.254
           mask: 24
           name: IF0
           proto: static
@@ -234,7 +234,6 @@ spec:
       network:
         interfaces:
         - address: 1.1.1.32
-          gateway: 1.1.1.254
           mask: 24
           name: IF0
           proto: static
@@ -250,7 +249,6 @@ spec:
       network:
         interfaces:
         - address: 1.1.1.33
-          gateway: 1.1.1.254
           mask: 24
           name: IF0
           proto: static
