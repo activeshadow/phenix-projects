@@ -1,19 +1,24 @@
 ---
-
 id: 49b5d2e0-273c-42b1-bc03-669b5362d532
 name: FrostyGoop Demonstration
 facts:
-- trait: frostygoop.target.ip
-  value: 10.0.40.100
-- trait: frostygoop.read.address
-  value: 40000
-- trait: frostygoop.read.count
-  value: 2
-- trait: frostygoop.write.address
-  value: 40001
-- trait: frostygoop.write.count
-  value: 1
-- trait: frostygoop.write.value
-  value: 0
+  - trait: remote.host.name
+    value: 10.0.40.200
+  - trait: sandcat.payload.location
+    value: "C:\\Users\\Public\\splunkd.exe"
+  - trait: caldera.url
+    value: "http://1.2.3.4:8888"
+  - trait: frostygoop.target.ip
+    value: 10.0.40.100
+  - trait: frostygoop.read.address
+    value: 40000
+  - trait: frostygoop.read.count
+    value: 1
+  - trait: frostygoop.write.address
+    value: 40000
+  - trait: frostygoop.write.count
+    value: 1
+  - trait: frostygoop.write.value
+    value: 1
 relationships: []
 rules: []

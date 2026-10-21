@@ -82,7 +82,7 @@
     <register type="input">
       <address>30001</address>
       <tag>speed.high</tag>
-      <scaling>0</scaling>
+      <scaling>2</scaling>
     </register>
     <register type="input">
       <address>30002</address>

