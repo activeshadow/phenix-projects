@@ -69,13 +69,14 @@ Once deployed, you can access the experiment and VMs by browsing to
 http://localhost:3000.
 
 You can verify the wind turbine model is operating as expected by checking the
-Grafana dashboard. To access the Grafana dashboard, you will need to use
-minimega's port forwarding capability since there are no VMs in this experiment
-with operating systems that include a browser.
+Grafana dashboard. To access the Grafana dashboard, you will need to download
+and use `phenix Tunneler` from the phenix UI.
 
 ```
-mm cc tunnel grafana 30000 localhost 3000
+phenix-tunneler serve http://localhost:3000
 ```
 
 Then, from your local computer, browse to http://localhost:30000 to access the
 Grafana UI. From there, browse to the `turbine` dashboard.
+
+There is also a custom wind turbine UI available at http://localhost:9101.
