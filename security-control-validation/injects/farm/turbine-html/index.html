@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101b2d" />
+    <title>North Ridge | Turbine telemetry</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="dashboard-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">NR</span>
+          <div>
+            <p class="eyebrow">NORTH RIDGE / UNIT 04</p>
+            <h1>Wind turbine telemetry</h1>
+          </div>
+        </div>
+        <div class="connection" aria-live="polite">
+          <span class="connection-dot" id="connection-dot"></span>
+          <span id="connection-label">Connecting</span>
+        </div>
+      </header>
+
+      <section class="hero-grid" aria-label="Turbine overview">
+        <article class="panel turbine-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">LIVE ASSET VIEW</p>
+              <h2>Unit 04</h2>
+            </div>
+            <div class="state-pill running" id="turbine-state">
+              <span class="state-dot"></span>
+              <span id="turbine-state-label">Generating</span>
+            </div>
+          </div>
+
+          <div class="turbine-scene">
+            <div class="scene-sun" aria-hidden="true"></div>
+            <svg class="turbine-svg" viewBox="0 0 800 550" role="img" aria-labelledby="turbine-title turbine-description">
+              <title id="turbine-title">Three-blade wind turbine</title>
+              <desc id="turbine-description">A wind turbine with rotating blades above a grassy horizon.</desc>
+              <defs>
+                <linearGradient id="sky-gradient" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0" stop-color="#172943" />
+                  <stop offset="1" stop-color="#274260" />
+                </linearGradient>
+                <linearGradient id="tower-gradient" x1="0" x2="1">
+                  <stop offset="0" stop-color="#afc8d1" />
+                  <stop offset="0.5" stop-color="#e5f0ed" />
+                  <stop offset="1" stop-color="#91aeb9" />
+                </linearGradient>
+              </defs>
+              <rect width="800" height="550" rx="18" fill="url(#sky-gradient)" />
+              <path d="M0 410 C150 375 238 410 350 394 C490 374 625 383 800 350 V550 H0Z" fill="#153d3d" />
+              <path d="M0 438 C168 405 290 448 417 421 C578 388 683 420 800 392 V550 H0Z" fill="#20534a" />
+              <path d="M373 530 L390 193 H428 L447 530Z" fill="url(#tower-gradient)" />
+              <path d="M384 530 H438" stroke="#a8c7c2" stroke-width="5" stroke-linecap="round" />
+              <g class="nacelle">
+                <path d="M380 183 C381 166 394 153 412 151 H459 C473 151 484 161 488 176 L474 192 H396Z" fill="#dce9e7" />
+                <path d="M454 152 H471 C484 153 496 164 499 177 L486 186 H466Z" fill="#9ebdc3" />
+              </g>
+              <g id="rotor" class="is-running">
+                <path d="M400 182 C385 164 356 128 344 92 C335 66 340 40 356 22 C377 44 387 72 393 105 C399 132 401 158 400 182Z" fill="#f2f8f4" />
+                <path d="M400 182 C385 164 356 128 344 92 C335 66 340 40 356 22 C377 44 387 72 393 105 C399 132 401 158 400 182Z" transform="rotate(120 400 182)" fill="#f2f8f4" />
+                <path d="M400 182 C385 164 356 128 344 92 C335 66 340 40 356 22 C377 44 387 72 393 105 C399 132 401 158 400 182Z" transform="rotate(240 400 182)" fill="#f2f8f4" />
+              </g>
+              <circle cx="400" cy="182" r="17" fill="#f4a261" />
+              <circle cx="400" cy="182" r="7" fill="#fff1d8" />
+              <path d="M80 466 H720" stroke="#76a99a" stroke-width="2" opacity="0.4" />
+              <g class="scene-label" transform="translate(50 480)">
+                <circle cx="7" cy="7" r="5" fill="#f4a261" />
+                <text x="20" y="12">RIDGE LINE / 1,240 M</text>
+              </g>
+            </svg>
+          </div>
+
+          <div class="turbine-footer">
+            <span><span class="footer-key">LAST UPDATE</span><strong id="last-update">Waiting for data</strong></span>
+            <span><span class="footer-key">MODE</span><strong id="mode-label">Automatic</strong></span>
+          </div>
+        </article>
+
+        <aside class="metrics-column" aria-label="Current readings">
+          <article class="panel metric-card metric-speed">
+            <div class="metric-copy">
+              <p class="eyebrow">WIND SPEED</p>
+              <h2><span id="speed-value">--</span><small>m/s</small></h2>
+              <p class="metric-note">10-minute average</p>
+            </div>
+            <svg class="mini-gauge" viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="gauge-track" cx="60" cy="60" r="43" />
+              <circle class="gauge-progress" id="speed-progress" cx="60" cy="60" r="43" />
+              <path d="M60 17 V25 M103 60 H95 M60 103 V95 M17 60 H25" stroke="#8ca7b0" stroke-width="2" opacity="0.6" />
+            </svg>
+          </article>
+
+          <article class="panel metric-card metric-direction">
+            <div class="metric-copy">
+              <p class="eyebrow">WIND DIRECTION</p>
+              <h2><span id="direction-value">---</span><small>°</small></h2>
+              <p class="metric-note" id="direction-name">Awaiting heading</p>
+            </div>
+            <div class="compass" aria-hidden="true">
+              <span class="compass-north">N</span>
+              <span class="compass-east">E</span>
+              <span class="compass-south">S</span>
+              <span class="compass-west">W</span>
+              <span class="compass-needle" id="direction-needle"></span>
+              <span class="compass-center"></span>
+            </div>
+          </article>
+
+          <article class="panel metric-card metric-temperature">
+            <div class="metric-copy">
+              <p class="eyebrow">AIR TEMPERATURE</p>
+              <h2><span id="temperature-value">--</span><small>°C</small></h2>
+              <p class="metric-note">Ambient at nacelle</p>
+            </div>
+            <svg class="mini-gauge" viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="gauge-track" cx="60" cy="60" r="43" />
+              <circle class="gauge-progress temperature-progress" id="temperature-progress" cx="60" cy="60" r="43" />
+              <path d="M60 17 V25 M103 60 H95 M60 103 V95 M17 60 H25" stroke="#8ca7b0" stroke-width="2" opacity="0.6" />
+            </svg>
+          </article>
+        </aside>
+      </section>
+
+      <footer class="page-footer">
+        <span>SIMULATION MODE</span>
+        <span class="footer-line"></span>
+        <span>DATA STREAM / 1.5 SEC</span>
+      </footer>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

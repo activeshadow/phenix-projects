@@ -1,0 +1,14 @@
+---
+id: 9f7a5fe5-d9d5-4f99-9a17-ac19bc37c504
+name: GridSecCon 2026 Demonstration - Lateral Movement
+facts:
+  - trait: lateral.planner.phenix.agent
+    value: corp-ws
+  - trait: remote.host.name
+    value: 10.0.40.200
+  - trait: sandcat.payload.location
+    value: "C:\\Users\\Public\\splunkd.exe"
+  - trait: caldera.url
+    value: "http://1.2.3.4:8888"
+relationships: []
+rules: []

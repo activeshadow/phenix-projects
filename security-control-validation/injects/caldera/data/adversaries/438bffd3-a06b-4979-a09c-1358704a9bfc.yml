@@ -1,0 +1,7 @@
+adversary_id: 438bffd3-a06b-4979-a09c-1358704a9bfc
+name: GridSecCon 2026 Demonstration - Lateral Movement
+description: Demonstration of lateral movement for GridSecCon 2026 presentation.
+atomic_ordering:
+  - f042b784-2f56-46a4-bd60-b62e0f01d9fd # T1021.006 # Lateral Movement via WRM
+objective: 495a9828-cab1-44dd-a0ca-66e58177d8cc
+tags: []

@@ -1,13 +1,9 @@
 ---
 id: 49b5d2e0-273c-42b1-bc03-669b5362d532
-name: FrostyGoop Demonstration
+name: GridSecCon 2026 Demonstration - FrostyGoop OT
 facts:
-  - trait: remote.host.name
-    value: 10.0.40.200
-  - trait: sandcat.payload.location
-    value: "C:\\Users\\Public\\splunkd.exe"
-  - trait: caldera.url
-    value: "http://1.2.3.4:8888"
+  - trait: frostygoop.planner.phenix.agent
+    value: farm-hmi
   - trait: frostygoop.target.ip
     value: 10.0.40.100
   - trait: frostygoop.read.address

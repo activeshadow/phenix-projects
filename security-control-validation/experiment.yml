@@ -3,6 +3,7 @@ kind: Experiment
 metadata:
   name: scv-demo
 spec:
+  defaultBridge: scv-demo
   scenario:
     apps:
       - name: caldera
@@ -107,6 +108,28 @@ spec:
             metadata:
               type: yaw-controller
               template: default
+      - name: scorch
+        metadata:
+          components:
+            - name: lateral-demo
+              type: caldera
+              metadata:
+                server: caldera
+                adversary: 438bffd3-a06b-4979-a09c-1358704a9bfc
+                facts: 9f7a5fe5-d9d5-4f99-9a17-ac19bc37c504
+            - name: frosty-demo
+              type: caldera
+              metadata:
+                server: caldera
+                adversary: d74855e5-dd44-44f3-906b-f01b4e4349ce
+                facts: 49b5d2e0-273c-42b1-bc03-669b5362d532
+          runs:
+            - start:
+                - lateral-demo
+            - start:
+                - frosty-demo
+          filebeat:
+            enabled: false
   topology:
     nodes:
       - general:
@@ -207,6 +230,8 @@ spec:
             dst: /etc/ot-sim/config.xml
           - src: /phenix/projects/security-control-validation/injects/farm/node-red.json
             dst: /etc/node-red.json
+          - src: /phenix/projects/security-control-validation/injects/farm/turbine-html
+            dst: /var/www/html
         network:
           interfaces:
             - address: 10.0.40.100
